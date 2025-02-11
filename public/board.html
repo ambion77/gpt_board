@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GPT생성 게시판</title>
+    <link rel="stylesheet" href="board.css">
+</head>
+<body>
+    <div class="board-container">
+        <h1>GPT 생성 게시판</h1>
+        <div class="board-buttons">
+            <button onclick="openCreatePopup()" style="margin-top: 10px;">새글</button>
+            <button onclick="deleteSelectedPosts()" style="margin-top: 10px;">삭제</button>
+        </div>
+        <table id="postTable">
+            <thead>
+                <tr>
+                    <th><input type="checkbox" id="selectAll"></th>
+                    <th>번호</th>
+                    <th>제목</th>
+                    <th>작성자</th>
+                    <th>조회수</th>
+                    <th>작성일</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+        <div id="pagination" class="pageArea"></div>
+    </div>
+
+    <!-- 팝업 레이어 -->
+    <div id="popupLayer" class="popup-layer">
+        <div class="popup-content">
+            <span class="close-btn" onclick="closePopup()">✖</span>
+            <h2 id="popupTitle"></h2>
+            <p id="popupContent"></p>
+            <p id="popupAuthor"></p>
+            <p id="popupDate"></p>
+        </div>
+    </div>
+
+    <script>
+        // 📌 체크박스 전체 선택/해제
+        document.getElementById("selectAll").addEventListener("change", function() {
+            const checkboxes = document.querySelectorAll(".post-checkbox");
+            checkboxes.forEach(cb => cb.checked = this.checked);
+        });
+
+        // 📌 게시글 목록 불러오기
+        function loadPosts(page = 1) {
+            fetch(`/posts?page=${page}`)
+                .then(response => response.json())
+                .then(data => {
+                    const tbody = document.querySelector("#postTable tbody");
+                    tbody.innerHTML = "";
+
+                    data.posts.forEach((post) => {
+                        const row = document.createElement("tr");
+                        row.innerHTML = `
+                            <td><input type="checkbox" class="post-checkbox" value="${post.id}"></td>
+                            <td>${post.id}</td>
+                            <td>
+                                <a href="#" class="post-title" 
+                                    data-id="${post.id}" 
+                                    style="--depth: ${post.depth || 0}">
+                                    ${post.title}
+                                </a>
+                            </td>
+                            <td>${post.author}</td>
+                            <td>${post.views}</td>
+                            <td>${post.date}</td>
+                        `;
+                        tbody.appendChild(row);
+                    });
+
+                    updatePagination(data.currentPage, data.totalPages);
+
+                    // 📌 제목 클릭 시 팝업 레이어 표시
+                    document.querySelectorAll(".post-title").forEach(title => {
+                        title.addEventListener("click", function(event) {
+                            event.preventDefault();
+                            const postId = this.getAttribute("data-id");
+                            openPopup(postId);
+                        });
+                    });
+                });
+        }
+
+        // 상세 팝업
+        function openPopup(postId) {
+            fetch(`/post/${postId}`)
+                .then(response => response.json())
+                .then(post => {
+                    const popupLayer = document.getElementById("popupLayer");
+                    const popupContent = document.querySelector(".popup-content");
+
+                    if (!popupLayer || !popupContent) {
+                        console.error("❌ 팝업 요소를 찾을 수 없습니다.");
+                        return;
+                    }
+
+                    popupContent.innerHTML = `
+                        <span class="close-btn" onclick="closePopup()">✖</span>
+                        <h2><input type='text' id='editTitle' value='${post.title}'></h2>
+                        <p><textarea class='editTxtArea' id='editContent'>${post.content}</textarea></p>
+                        <p id="popupAuthor">작성자: ${post.author}</p>
+                        <p id="popupDate">작성일: ${post.date}</p>
+                        <input id="popupViews" type="hidden" value='${post.views}'></input>
+                        <input id="popupDepth" type="hidden" value='${post.depth}'></input>
+                        <div class="popup-buttons" style="display: flex; justify-content: flex-end; gap: 10px;">
+                            <button id="replyPostButton" class="reply-btn">답글</button>
+                            <button id="updatePostButton" class="update-btn">수정</button>
+                            <button id="deletePostButton" class="delete-btn">삭제</button>
+                        </div>
+                    `;
+
+                    
+                    document.getElementById("replyPostButton").onclick = () => openReplyPopup(post.id);
+                    document.getElementById("updatePostButton").onclick = () => updatePost(post.id);
+                    document.getElementById("deletePostButton").onclick = () => deletePost(post.id);
+
+                    popupLayer.style.display = "flex";
+                })
+                .catch(error => console.error("❌ 게시글 데이터를 불러오는 중 오류 발생:", error));
+        }
+
+        // 📌 팝업 닫기
+        function closePopup() {
+            document.getElementById("popupLayer").style.display = "none";
+            setTimeout(() => {
+                window.location.reload(); // 목록 새로고침
+            }, 100);  // 100ms 후 새로고침 (이동 후 반영)
+        }
+
+        // 📌 페이지네이션 업데이트
+        function updatePagination(currentPage, totalPages) {
+            const paginationContainer = document.getElementById("pagination");
+            paginationContainer.innerHTML = "";
+
+            for (let i = 1; i <= totalPages; i++) {
+                const button = document.createElement("button");
+                button.innerText = i;
+                button.onclick = () => loadPosts(i);
+                if (i === currentPage) {
+                    button.style.fontWeight = "bold";
+                }
+                paginationContainer.appendChild(button);
+            }
+        }
+
+        // 📌 목록에서 체크된 항목 삭제
+        function deleteSelectedPosts() {
+            const checkedBoxes = document.querySelectorAll(".post-checkbox:checked");
+            const selectedIds = Array.from(checkedBoxes).map(cb => cb.value);
+
+            if (selectedIds.length === 0) {
+                alert("❗ 삭제할 게시글을 선택하세요.");
+                return;
+            }
+
+            fetch("/deletePosts", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ ids: selectedIds })
+            }).then(response => response.json())
+            .then(data => {
+                alert(data.message);
+                loadPosts(); // 삭제 후 목록 새로고침
+            });
+        }
+
+        //상세 수정
+        function updatePost(postId) {
+            const updatedPost = {
+                id: postId,
+                title: document.getElementById("editTitle").value,
+                author: document.getElementById("popupAuthor").innerText.replace("작성자: ", ""),
+                content: document.getElementById("editContent").value,
+                date: document.getElementById("popupDate").innerText.replace("작성일: ", ""),
+                depth: document.getElementById("popupDepth").value,
+                views: document.getElementById("popupViews").value
+            };
+
+            fetch("/updatePosts", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(updatedPost)
+            }).then(response => response.json())
+            .then(data => {
+                alert(data.message);
+                closePopup();
+                loadPosts();
+            });
+        }
+
+        //상세팝업에서 삭제
+        function deletePost(postId) {
+            if (!confirm("정말 이 게시글을 삭제하시겠습니까?")) return;
+
+            fetch(`/deletePost/${postId}`, {
+                method: "DELETE"
+            })
+            .then(response => response.json())
+            .then(data => {
+                alert(data.message);
+                closePopup();
+                loadPosts(); // 게시글 목록 새로고침
+            })
+            .catch(error => console.error("❌ 게시글 삭제 중 오류 발생:", error));
+        }
+
+        // 📌 새 글 작성 팝업
+        function openCreatePopup() {
+            const popupLayer = document.getElementById("popupLayer");
+            const popupContent = document.querySelector(".popup-content");
+            popupContent.innerHTML = `
+                <span class="close-btn" onclick="closePopup()">✖</span>
+                <h2>새 글 작성</h2>
+                <input type='text' id='newTitle' placeholder='제목 입력' maxlength='100'>
+                <textarea class='addTxtArea' id='newContent' placeholder='내용 입력' maxlength='1000'></textarea>
+                <p id="popupAuthor">작성자: <input type='text' id='newAuthor' maxlength='20'></p>
+                <div class="popup-buttons">
+                    <button id="createPostButton" class="create-btn">등록</button>
+                </div>
+            `;
+            document.getElementById("createPostButton").onclick = createPost;
+            popupLayer.style.display = "flex";
+        }
+
+        // 📌 새 글 작성
+        function createPost() {
+            const title = document.getElementById("newTitle").value.trim();
+            const author = document.getElementById("newAuthor").value.trim();
+            const content = document.getElementById("newContent").value.trim();
+
+            if (!title || !author || !content) {
+                alert("⚠️ 제목, 작성자, 내용을 모두 입력해주세요.");
+                return;
+            }
+
+            if (title.length > 50) {
+                alert("⚠️ 제목은 50글자를 초과할 수 없습니다.");
+                return;
+            }
+            if (author.length > 10) {
+                alert("⚠️ 작성자는 10글자를 초과할 수 없습니다.");
+                return;
+            }
+            if (content.length > 1000) {
+                alert("⚠️ 내용은 1000글자를 초과할 수 없습니다.");
+                return;
+            }
+
+            const newPost = { title, author, content };
+
+            fetch("/createPosts", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(newPost)
+            }).then(response => response.json())
+            .then(data => {
+                alert(data.message);
+                closePopup();
+                loadPosts();
+            });
+        }
+
+        // 답변글 팝업 
+        function openReplyPopup(postId) {
+            const popupLayer = document.getElementById("popupLayer");
+            const popupContent = document.querySelector(".popup-content");
+            popupContent.innerHTML = `
+                <span class="close-btn" onclick="closePopup()">✖</span>
+                <h2>답변 작성</h2>
+                <textarea class='editTxtArea' id='replyContent' placeholder='답변 입력' maxlength='1000'></textarea>
+                <p>작성자: <input type='text' id='replyAuthor' maxlength='10'></p>
+                <div class="popup-buttons">
+                    <button id="submitReplyButton" class="create-btn">등록</button>
+                </div>
+            `;
+            document.getElementById("submitReplyButton").onclick = () => submitReply(postId);
+            popupLayer.style.display = "flex";
+        }
+
+        //답변글 쓰기
+        function submitReply(postId) {
+            const author = document.getElementById("replyAuthor").value.trim();
+            const content = document.getElementById("replyContent").value.trim();
+
+            if (!author || !content) {
+                alert("⚠️ 작성자와 답변 내용을 입력해주세요.");
+                return;
+            }
+
+            if (author.length > 10) {
+                alert("⚠️ 작성자는 10글자를 초과할 수 없습니다.");
+                return;
+            }
+            if (content.length > 1000) {
+                alert("⚠️ 답변 내용은 1000글자를 초과할 수 없습니다.");
+                return;
+            }
+
+            const reply = { postId, author, content };
+            
+            fetch("/addReply", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(reply)
+            }).then(response => response.json())
+            .then(data => {
+                alert(data.message);
+                closePopup();
+                loadPosts();
+            });
+        }
+
+
+        // 📌 초기 데이터 로드
+        loadPosts();
+    </script>
+</body>
+</html>
