@@ -49,7 +49,7 @@
 
         // 📌 게시글 목록 불러오기
         function loadPosts(page = 1) {
-            fetch(`/posts?page=${page}`)
+            fetch(`http://localhost:3000/posts?page=${page}`)
                 .then(response => response.json())
                 .then(data => {
                     const tbody = document.querySelector("#postTable tbody");
@@ -89,7 +89,7 @@
 
         // 상세 팝업
         function openPopup(postId) {
-            fetch(`/post/${postId}`)
+            fetch(`http://localhost:3000/post/${postId}`)
                 .then(response => response.json())
                 .then(post => {
                     const popupLayer = document.getElementById("popupLayer");
@@ -159,7 +159,7 @@
                 return;
             }
 
-            fetch("/deletePosts", {
+            fetch("http://localhost:3000/deletePosts", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ ids: selectedIds })
@@ -182,7 +182,7 @@
                 views: document.getElementById("popupViews").value
             };
 
-            fetch("/updatePosts", {
+            fetch("http://localhost:3000/updatePosts", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(updatedPost)
@@ -198,7 +198,7 @@
         function deletePost(postId) {
             if (!confirm("정말 이 게시글을 삭제하시겠습니까?")) return;
 
-            fetch(`/deletePost/${postId}`, {
+            fetch(`http://localhost:3000/deletePost/${postId}`, {
                 method: "DELETE"
             })
             .then(response => response.json())
@@ -254,7 +254,7 @@
 
             const newPost = { title, author, content };
 
-            fetch("/createPosts", {
+            fetch("http://localhost:3000/createPosts", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(newPost)
@@ -304,7 +304,7 @@
 
             const reply = { postId, author, content };
             
-            fetch("/addReply", {
+            fetch("http://localhost:3000/addReply", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(reply)

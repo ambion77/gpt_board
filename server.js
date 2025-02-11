@@ -2,6 +2,9 @@ import express from "express";
 import fs from "fs";
 import cors from "cors";
 import { XMLParser, XMLBuilder } from "fast-xml-parser";
+import userRoutes from "./routes/userRoutes.js";
+import authRoutes from "./routes/authRoutes.js";
+import "dotenv/config";
 
 const app = express();
 const PORT = 3000;
@@ -10,9 +13,13 @@ app.use(express.json());
 app.use(cors());
 app.use(express.static("public"));
 
-const xmlFilePath = "board.xml";
-const POSTS_PER_PAGE = 10;
+app.use("/api/users", userRoutes);  // 사용자 CRUD API 추가
+app.use("/api/auth", authRoutes); // 로그인 API 추가
 
+const xmlFilePath = "board.xml";    // 📌 XML 파일 경로
+const POSTS_PER_PAGE = 10;  // 📌 한 페이지당 게시글 수
+
+//xml 파일에서 데이터 읽기
 function readXML() {
     if (!fs.existsSync(xmlFilePath)) {
         return { board: { post: [] } };// XML 파일이 없으면 기본 구조 반환
@@ -42,6 +49,7 @@ function readXML() {
     }
 }
 
+//xml 파일에 데이터 쓰기
 function writeXML(data) {
     const xmlContent = new XMLBuilder({ format: true }).build(data);
     fs.writeFileSync(xmlFilePath, xmlContent, "utf-8");
