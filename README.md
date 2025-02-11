@@ -1,10 +1,87 @@
 # A.I. 생성 게시판
+1. 실행방법
 -콘솔에서 로그인 서버 시작
 node login.js
 -콘솔에서 게시판 서버 시작
 node board.js
 -vscode콘솔에서 로컬서버 시작
 npm run dev
+
+2. 프로젝트 생성방법
+npm create vite@latest total
+cd total
+npm init -y
+npm install express mysql2 bcrypt jsonwebtoken dotenv cors fast-xml-parser
+
+3. DB생성방법
+ 3-1. mysql 설치
+ 3-2. DB 생성(MY_DATA)
+ 3-3. 테이블 생성
+CREATE TABLE users (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    username VARCHAR(100) NOT NULL,
+    email VARCHAR(100) NOT NULL,
+    password VARCHAR(255) NOT NULL
+);
+3-4. 데이터 입력
+INSERT INTO my_data.users
+(id, username, email, password)
+VALUES(1, 'jay_updateded', 'jay_updateded@example.com', '$2b$10$64g5FlAgYbuv.wZrTpd6iuyTsgG41UDGUnkuZVntg2Cu8rEEE5JHG');
+
+INSERT INTO my_data.users
+(id, username, email, password)
+VALUES(2, 'jin', 'jin@example.com', '$2b$10$fXR/OjnL8GJnEujBQqUIoe9/MJnGIvNU1.Vm433/mHUhCnb.aLsOi');
+
+4. 소스생성
+A.I.에게 게시판 답변형 게시판 생성요청
+  board.html
+  board.css
+  board.js
+
+A.I.에게 사용자정보 CRUD 가능한 restful API 서버 생성 요청
+  login.html
+  login.js
+  db.js
+  authRoutes.js
+  userRoutes.js
+
+5. postman으로 사용자정보 CRUD확인  
+5-1. 입력 
+POST 방식 http://localhost:5000/api/users
+ body raw json 값에 추가
+{
+  "username": "rose",
+  "email": "rose@example.com",
+  "password":"5678"
+} 
+
+5-2. 수정
+PUT방식 http://localhost:5000/api/users/1
+ body raw json 값에 추가
+{
+  "username": "rose_updateded",
+  "email": "rose_updateded@example.com"
+}
+
+5-3.삭제
+DELETE 방식 http://localhost:5000/api/users/3
+  결과
+{
+    "message": "사용자 삭제 성공"
+}
+
+5-4. 조회
+  5-4-1. ID4인 사용자 정보 가져오기
+GET 방식 http://localhost:5000/api/users/1
+  결과:
+{
+    "id": 1,
+    "username": "jay_updateded",
+    "email": "jay_updateded@example.com",
+    "password": "1234"
+}
+  5-4-2. 전체 사용자 정보 가져오기
+GET 방식 http://localhost:5000/api/users
 
 # React + Vite
 
