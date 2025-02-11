@@ -1,5 +1,10 @@
 # A.I. 생성 게시판
-
+-콘솔에서 로그인 서버 시작
+node login.js
+-콘솔에서 게시판 서버 시작
+node board.js
+-vscode콘솔에서 로컬서버 시작
+npm run dev
 
 # React + Vite
 
