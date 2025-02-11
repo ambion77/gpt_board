@@ -2,15 +2,8 @@
 
 1. 실행방법
 
--콘솔에서 로그인 서버 시작
-node login.js
-
--콘솔에서 게시판 서버 시작
-node board.js
-
 -vscode콘솔에서 로컬서버 시작
 npm run dev
-
 
 2. 프로젝트 생성방법
 
@@ -20,7 +13,7 @@ cd total
 
 npm init -y
 
-npm install express mysql2 bcrypt jsonwebtoken dotenv cors fast-xml-parser
+npm install express mysql2 bcrypt jsonwebtoken dotenv cors fast-xml-parser concurrently
 
 
 3. DB생성방법
@@ -57,14 +50,12 @@ A.I.에게 게시판 답변형 게시판 생성요청
 
   board.css
 
-  board.js
+  server.js // 게시판과 사용자 정보 로그인 등 서버사이드 소스
 
 
 A.I.에게 사용자정보 CRUD 가능한 restful API 서버 생성 요청
 
   login.html
-
-  login.js
 
   db.js
 
@@ -77,7 +68,7 @@ A.I.에게 사용자정보 CRUD 가능한 restful API 서버 생성 요청
 
 5-1. 입력 
 
-POST 방식 http://localhost:5000/api/users
+POST 방식 http://localhost:3000/api/users
 
  body raw json 값에 추가
 
@@ -89,7 +80,7 @@ POST 방식 http://localhost:5000/api/users
 
 5-2. 수정
 
-PUT방식 http://localhost:5000/api/users/1
+PUT방식 http://localhost:3000/api/users/1
 
  body raw json 값에 추가
 
@@ -101,7 +92,7 @@ PUT방식 http://localhost:5000/api/users/1
 
 5-3.삭제
 
-DELETE 방식 http://localhost:5000/api/users/3
+DELETE 방식 http://localhost:3000/api/users/3
 
   결과
 
@@ -113,7 +104,7 @@ DELETE 방식 http://localhost:5000/api/users/3
 
   5-4-1. ID4인 사용자 정보 가져오기
 
-GET 방식 http://localhost:5000/api/users/1
+GET 방식 http://localhost:3000/api/users/1
 
   결과:
 
@@ -126,7 +117,7 @@ GET 방식 http://localhost:5000/api/users/1
 
   5-4-2. 전체 사용자 정보 가져오기
 
-GET 방식 http://localhost:5000/api/users
+GET 방식 http://localhost:3000/api/users
 
 
 # React + Vite
