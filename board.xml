@@ -2,7 +2,7 @@
   <post>
     <id>1</id>
     <title>[공지] 게시판 관련 공지</title>
-    <author>1</author>
+    <author>admin</author>
     <content>게시판 관련 공지
 게시판 관련 공지
 게시판 관련 공지</content>
@@ -13,35 +13,12 @@
   <post>
     <id>2</id>
     <title>[문답게시판] 문답게시판 공지</title>
-    <author>관리자</author>
+    <author>admin</author>
     <content>문답게시판 공지
 문답게시판 공지
 문답게시판 공지</content>
     <date>2025-02-11 14:51:16</date>
     <depth>0</depth>
-    <views>0</views>
-  </post>
-  <post>
-    <id>3</id>
-    <title>문의드립니다.</title>
-    <author>게스트1</author>
-    <content>문의드립니다.
-문의드립니다.</content>
-    <date>2025-02-11 14:51:42</date>
-    <depth>0</depth>
-    <views>1</views>
-  </post>
-  <post>
-    <id>4</id>
-    <parentId>3</parentId>
-    <depth>1</depth>
-    <title>Re: 문의드립니다.</title>
-    <author>관리자</author>
-    <content>답변입니다.
-답변입니다.
-
-답변입니다.</content>
-    <date>2025-02-11 14:52:07</date>
     <views>0</views>
   </post>
 </board>

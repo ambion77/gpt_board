@@ -3,6 +3,7 @@
 1. 실행방법
 
 -vscode콘솔에서 로컬서버 시작
+
 npm run dev
 
 2. 프로젝트 생성방법
@@ -26,6 +27,7 @@ npm install express mysql2 bcrypt jsonwebtoken dotenv cors fast-xml-parser concu
 
 CREATE TABLE users (
     id INT AUTO_INCREMENT PRIMARY KEY,
+    userid VARCHAR(100) NOT NULL,
     username VARCHAR(100) NOT NULL,
     email VARCHAR(100) NOT NULL,
     password VARCHAR(255) NOT NULL
@@ -34,12 +36,12 @@ CREATE TABLE users (
 3-4. 데이터 입력
 
 INSERT INTO my_data.users
-(id, username, email, password)
-VALUES(1, 'jay_updateded', 'jay_updateded@example.com', '$2b$10$64g5FlAgYbuv.wZrTpd6iuyTsgG41UDGUnkuZVntg2Cu8rEEE5JHG');
+(id, userid, username, email, password)
+VALUES(1,'admin','관리자', 'admin@example.com', '1234');
 
 INSERT INTO my_data.users
-(id, username, email, password)
-VALUES(2, 'jin', 'jin@example.com', '$2b$10$fXR/OjnL8GJnEujBQqUIoe9/MJnGIvNU1.Vm433/mHUhCnb.aLsOi');
+(id, userid, username, email, password)
+VALUES(2, 'guest','게스트', 'guest@example.com', '5678');
 
 
 4. 소스생성
@@ -73,26 +75,27 @@ POST 방식 http://localhost:3000/api/users
  body raw json 값에 추가
 
 {
-  "username": "rose",
-  "email": "rose@example.com",
+  "userid": "admin",
+  "username": "관리자",
+  "email": "admin@example.com",
   "password":"5678"
 } 
 
 5-2. 수정
 
-PUT방식 http://localhost:3000/api/users/1
+PUT방식 http://localhost:3000/api/users/admin
 
  body raw json 값에 추가
 
 {
-  "username": "rose_updateded",
-  "email": "rose_updateded@example.com"
+  "username": "관리자수정",
+  "email": "admin_u@example.com"
 }
 
 
 5-3.삭제
 
-DELETE 방식 http://localhost:3000/api/users/3
+DELETE 방식 http://localhost:3000/api/users/admin
 
   결과
 
@@ -104,14 +107,15 @@ DELETE 방식 http://localhost:3000/api/users/3
 
   5-4-1. ID4인 사용자 정보 가져오기
 
-GET 방식 http://localhost:3000/api/users/1
+GET 방식 http://localhost:3000/api/users/admin
 
   결과:
 
 {
     "id": 1,
-    "username": "jay_updateded",
-    "email": "jay_updateded@example.com",
+    "userid": 'admin',
+    "username": "관리자",
+    "email": "admin@example.com",
     "password": "1234"
 }
 

@@ -5,6 +5,7 @@ import { XMLParser, XMLBuilder } from "fast-xml-parser";
 import userRoutes from "./routes/userRoutes.js";
 import authRoutes from "./routes/authRoutes.js";
 import "dotenv/config";
+import jwt from "jsonwebtoken";
 
 const app = express();
 const PORT = 3000;
@@ -124,28 +125,28 @@ app.get("/post/:id", (req, res) => {
     res.json(posts[postIndex]);
 });
 
-// 📌 게시글 추가
-app.post("/createPosts", (req, res) => {
-    const { title, author, content } = req.body;
+// ✅ 게시글 추가 (인증 필요)
+app.post("/createPosts", verifyToken, (req, res) => {
+    const { title, content } = req.body;
+    const author = req.user.userid; // JWT에서 사용자 이메일 가져오기
     let data = readXML();
 
-    const newId = data.board.post.length > 0 
-        ? Math.max(...data.board.post.map(post => parseInt(post.id))) + 1 
+    const newId = data.board.post.length > 0
+        ? Math.max(...data.board.post.map(post => parseInt(post.id))) + 1
         : 1;
 
-    // 📌 현재 시간을 ISO 8601 형식으로 변환
     const offset = new Date().getTimezoneOffset() * 60000;
     const today = new Date(Date.now() - offset);
-    const formattedDate = today.toISOString().replace("T", " ").split(".")[0]; // YYYY-MM-DDTHH:mm:ss 형식
+    const formattedDate = today.toISOString().replace("T", " ").split(".")[0];
 
-    const newPost = { 
-        id: newId.toString(), 
-        title, 
-        author, 
-        content, 
-        date:formattedDate, 
+    const newPost = {
+        id: newId.toString(),
+        title,
+        author,
+        content,
+        date: formattedDate,
         depth: 0,
-        views: 0 // 📌 조회수 기본값 추가
+        views: 0
     };
 
     data.board.post.push(newPost);
@@ -154,7 +155,7 @@ app.post("/createPosts", (req, res) => {
 });
 
 // 📌 목록에서 체크된 게시글 삭제
-app.post("/deletePosts", (req, res) => {
+app.post("/deletePosts", verifyToken,(req, res) => {
     const { ids } = req.body;
     let data = readXML();
 
@@ -166,8 +167,8 @@ app.post("/deletePosts", (req, res) => {
     res.json({ message: "🗑️ 선택한 게시글 삭제 완료!" });
 });
 
-//상세에서 삭제
-app.delete("/deletePost/:id", (req, res) => {
+// ✅ 게시글 삭제 (인증 필요)
+app.delete("/deletePost/:id", verifyToken, (req, res) => {
     const postId = req.params.id;
     let data = readXML();
 
@@ -176,14 +177,22 @@ app.delete("/deletePost/:id", (req, res) => {
         return res.status(404).json({ message: "❌ 해당 게시글을 찾을 수 없습니다." });
     }
 
+    const post = data.board.post[postIndex];
+
+    // ✅ 게시글 작성자와 로그인한 사용자가 일치하는지 확인
+    if (post.author !== req.user.userid) {
+        return res.status(403).json({ message: "❌ 게시글을 삭제할 권한이 없습니다." });
+    }
+
     data.board.post.splice(postIndex, 1);
     writeXML(data);
     res.json({ message: "🗑 게시글 삭제 완료!" });
 });
 
 // 📌 게시글 수정
-app.post("/updatePosts", (req, res) => {
-    const { id, title, author, content, date, depth, views} = req.body;
+app.post("/updatePosts", verifyToken, (req, res) => {
+    const { id, parentId, title, author, content, date, depth, views} = req.body;
+    
     let data = readXML();
 
     let postIndex = data.board.post.findIndex(post => post.id == id);
@@ -191,16 +200,25 @@ app.post("/updatePosts", (req, res) => {
         return res.status(404).json({ message: "❌ 해당 게시글을 찾을 수 없습니다." });
     }
 
-    data.board.post[postIndex] = { id, title, author, content, date, depth, views };
+    const post = data.board.post[postIndex];
+    // ✅ 게시글 작성자와 로그인한 사용자가 일치하는지 확인
+    if (post.author !== req.user.userid) {
+        return res.status(403).json({ message: "❌ 게시글을 수정할 권한이 없습니다." });
+    }
+    if(depth == 0){
+        data.board.post[postIndex] = { id, title, author, content, date, depth, views };
+    }else{
+        data.board.post[postIndex] = { id, parentId ,title, author, content, date, depth, views };
+    }     
     writeXML(data);
     res.json({ message: "✅ 게시글 수정 완료!" });
 });
 
 
 // 📌 답글 추가 
-app.post("/addReply", (req, res) => {
+app.post("/addReply", verifyToken, (req, res) => {
     const data = readXML();
-    const { postId, author, content, views } = req.body;
+    const { postId,  content, views } = req.body;
 
     const parentPost = data.board.post.find(p => p.id === postId);
     if (!parentPost) {
@@ -217,7 +235,7 @@ app.post("/addReply", (req, res) => {
         parentId: postId,
         depth: parseInt(parentPost.depth) + 1,
         title: `  Re: ${parentPost.title}`,
-        author: author,
+        author: req.user.userid,
         content: content,
         date: formattedDate,
         views: 0 // 📌 조회수 기본값 추가
@@ -227,6 +245,26 @@ app.post("/addReply", (req, res) => {
     writeXML(data);
     res.json({ message: "✅ 답글이 성공적으로 추가되었습니다!" });
 });
+
+// ✅ JWT 검증 미들웨어
+function verifyToken(req, res, next) {
+    const token = req.header("Authorization");
+    console.log('verifyToken::'+token);
+
+    if (!token) {
+        return res.status(403).json({ message: "접근이 거부되었습니다. 로그인해주세요." });
+    }
+
+    jwt.verify(token.replace("Bearer ", ""), "SECRET_KEY", (err, decoded) => {
+        if (err) {
+            return res.status(401).json({ message: "유효하지 않은 토큰입니다." });
+        }
+        req.user = decoded; // 디코딩된 사용자 정보 저장
+        console.log('req.user.id:::'+req.user.id);
+        console.log('req.user.email:::'+req.user.email);
+        next();
+    });
+}
 
 app.listen(PORT, () => {
     console.log(`🚀 서버 실행 중: http://localhost:${PORT}`);

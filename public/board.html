@@ -49,6 +49,7 @@
 
         // 📌 게시글 목록 불러오기
         function loadPosts(page = 1) {
+            
             fetch(`http://localhost:3000/posts?page=${page}`)
                 .then(response => response.json())
                 .then(data => {
@@ -106,6 +107,7 @@
                         <p><textarea class='editTxtArea' id='editContent'>${post.content}</textarea></p>
                         <p id="popupAuthor">작성자: ${post.author}</p>
                         <p id="popupDate">작성일: ${post.date}</p>
+                        <input id="popupParentId" type="hidden" value='${post.parentId}'></input>
                         <input id="popupViews" type="hidden" value='${post.views}'></input>
                         <input id="popupDepth" type="hidden" value='${post.depth}'></input>
                         <div class="popup-buttons" style="display: flex; justify-content: flex-end; gap: 10px;">
@@ -161,7 +163,7 @@
 
             fetch("http://localhost:3000/deletePosts", {
                 method: "POST",
-                headers: { "Content-Type": "application/json" },
+                headers: { "Content-Type": "application/json" ,"Authorization": `Bearer ${localStorage.getItem("jwt")}`},
                 body: JSON.stringify({ ids: selectedIds })
             }).then(response => response.json())
             .then(data => {
@@ -174,6 +176,7 @@
         function updatePost(postId) {
             const updatedPost = {
                 id: postId,
+                parentId: document.getElementById("popupParentId").value,
                 title: document.getElementById("editTitle").value,
                 author: document.getElementById("popupAuthor").innerText.replace("작성자: ", ""),
                 content: document.getElementById("editContent").value,
@@ -184,7 +187,7 @@
 
             fetch("http://localhost:3000/updatePosts", {
                 method: "POST",
-                headers: { "Content-Type": "application/json" },
+                headers: { "Content-Type": "application/json" ,"Authorization": `Bearer ${localStorage.getItem("jwt")}`},
                 body: JSON.stringify(updatedPost)
             }).then(response => response.json())
             .then(data => {
@@ -199,7 +202,10 @@
             if (!confirm("정말 이 게시글을 삭제하시겠습니까?")) return;
 
             fetch(`http://localhost:3000/deletePost/${postId}`, {
-                method: "DELETE"
+                method: "DELETE",
+                headers: { "Content-Type": "application/json",
+                            "Authorization": `Bearer ${localStorage.getItem("jwt")}`,
+                 }
             })
             .then(response => response.json())
             .then(data => {
@@ -219,7 +225,6 @@
                 <h2>새 글 작성</h2>
                 <input type='text' id='newTitle' placeholder='제목 입력' maxlength='100'>
                 <textarea class='addTxtArea' id='newContent' placeholder='내용 입력' maxlength='1000'></textarea>
-                <p id="popupAuthor">작성자: <input type='text' id='newAuthor' maxlength='20'></p>
                 <div class="popup-buttons">
                     <button id="createPostButton" class="create-btn">등록</button>
                 </div>
@@ -231,11 +236,11 @@
         // 📌 새 글 작성
         function createPost() {
             const title = document.getElementById("newTitle").value.trim();
-            const author = document.getElementById("newAuthor").value.trim();
+            //const author = document.getElementById("newAuthor").value.trim();
             const content = document.getElementById("newContent").value.trim();
 
-            if (!title || !author || !content) {
-                alert("⚠️ 제목, 작성자, 내용을 모두 입력해주세요.");
+            if (!title || !content) {
+                alert("⚠️ 제목, 내용을 모두 입력해주세요.");
                 return;
             }
 
@@ -243,20 +248,20 @@
                 alert("⚠️ 제목은 50글자를 초과할 수 없습니다.");
                 return;
             }
-            if (author.length > 10) {
-                alert("⚠️ 작성자는 10글자를 초과할 수 없습니다.");
+            /*if (author.length > 20) {
+                alert("⚠️ 작성자는 20글자를 초과할 수 없습니다.");
                 return;
-            }
+            }*/
             if (content.length > 1000) {
                 alert("⚠️ 내용은 1000글자를 초과할 수 없습니다.");
                 return;
             }
 
-            const newPost = { title, author, content };
+            const newPost = { title, content };
 
             fetch("http://localhost:3000/createPosts", {
                 method: "POST",
-                headers: { "Content-Type": "application/json" },
+                headers: { "Content-Type": "application/json","Authorization": `Bearer ${localStorage.getItem("jwt")}` },
                 body: JSON.stringify(newPost)
             }).then(response => response.json())
             .then(data => {
@@ -274,7 +279,6 @@
                 <span class="close-btn" onclick="closePopup()">✖</span>
                 <h2>답변 작성</h2>
                 <textarea class='editTxtArea' id='replyContent' placeholder='답변 입력' maxlength='1000'></textarea>
-                <p>작성자: <input type='text' id='replyAuthor' maxlength='10'></p>
                 <div class="popup-buttons">
                     <button id="submitReplyButton" class="create-btn">등록</button>
                 </div>
@@ -285,28 +289,28 @@
 
         //답변글 쓰기
         function submitReply(postId) {
-            const author = document.getElementById("replyAuthor").value.trim();
+            //const author = document.getElementById("replyAuthor").value.trim();
             const content = document.getElementById("replyContent").value.trim();
 
-            if (!author || !content) {
-                alert("⚠️ 작성자와 답변 내용을 입력해주세요.");
+            if (!content) {
+                alert("⚠️ 답변 내용을 입력해주세요.");
                 return;
             }
 
-            if (author.length > 10) {
-                alert("⚠️ 작성자는 10글자를 초과할 수 없습니다.");
+            /*if (author.length > 20) {
+                alert("⚠️ 작성자는 20글자를 초과할 수 없습니다.");
                 return;
-            }
+            }*/
             if (content.length > 1000) {
                 alert("⚠️ 답변 내용은 1000글자를 초과할 수 없습니다.");
                 return;
             }
 
-            const reply = { postId, author, content };
+            const reply = { postId, content };
             
             fetch("http://localhost:3000/addReply", {
                 method: "POST",
-                headers: { "Content-Type": "application/json" },
+                headers: { "Content-Type": "application/json" ,"Authorization": `Bearer ${localStorage.getItem("jwt")}`},
                 body: JSON.stringify(reply)
             }).then(response => response.json())
             .then(data => {
