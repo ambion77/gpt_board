@@ -4,6 +4,7 @@ import cors from "cors";
 import { XMLParser, XMLBuilder } from "fast-xml-parser";
 import userRoutes from "./routes/userRoutes.js";
 import authRoutes from "./routes/authRoutes.js";
+import menuRoutes from "./routes/menuRoutes.js";
 import "dotenv/config";
 import jwt from "jsonwebtoken";
 
@@ -16,6 +17,7 @@ app.use(express.static("public"));
 
 app.use("/api/users", userRoutes);  // 사용자 CRUD API 추가
 app.use("/api/auth", authRoutes); // 로그인 API 추가
+app.use("/api/menu", menuRoutes); // 로그인 API 추가
 
 const xmlFilePath = "board.xml";    // 📌 XML 파일 경로
 const POSTS_PER_PAGE = 10;  // 📌 한 페이지당 게시글 수
@@ -234,7 +236,7 @@ app.post("/addReply", verifyToken, (req, res) => {
         id: (data.board.post.length + 1).toString(),
         parentId: postId,
         depth: parseInt(parentPost.depth) + 1,
-        title: `  Re: ${parentPost.title}`,
+        title: '  Re:'+ `${parentPost.title}`,
         author: req.user.userid,
         content: content,
         date: formattedDate,
@@ -249,7 +251,7 @@ app.post("/addReply", verifyToken, (req, res) => {
 // ✅ JWT 검증 미들웨어
 function verifyToken(req, res, next) {
     const token = req.header("Authorization");
-    console.log('verifyToken::'+token);
+    console.log('server.js verifyToken::'+token);
 
     if (!token) {
         return res.status(403).json({ message: "접근이 거부되었습니다. 로그인해주세요." });
@@ -260,8 +262,8 @@ function verifyToken(req, res, next) {
             return res.status(401).json({ message: "유효하지 않은 토큰입니다." });
         }
         req.user = decoded; // 디코딩된 사용자 정보 저장
-        console.log('req.user.id:::'+req.user.id);
-        console.log('req.user.email:::'+req.user.email);
+        console.log('server.js req.user.id:::'+req.user.id);
+        console.log('server.js req.user.email:::'+req.user.email);
         next();
     });
 }

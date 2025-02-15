@@ -42,7 +42,7 @@
             if (response.ok) {
                 document.getElementById("message").innerText = "✅ 로그인 성공!";
                 localStorage.setItem("jwt", data.token); // 토큰 저장
-                setTimeout(() => window.location.href = "/board.html", 1000); // 로그인 후 이동
+                setTimeout(() => window.location.href = "/App", 500); // 로그인 후 이동
             } else {
                 document.getElementById("message").innerText = `❌ ${data.message}`;
             }

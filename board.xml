@@ -8,7 +8,7 @@
 게시판 관련 공지</content>
     <date>2025-02-11 12:48:58</date>
     <depth>0</depth>
-    <views>2</views>
+    <views>5</views>
   </post>
   <post>
     <id>2</id>
@@ -18,6 +18,87 @@
 문답게시판 공지
 문답게시판 공지</content>
     <date>2025-02-11 14:51:16</date>
+    <depth>0</depth>
+    <views>12</views>
+  </post>
+  <post>
+    <id>3</id>
+    <title>문의드립니다.</title>
+    <author>riz</author>
+    <content>문의드립니다.</content>
+    <date>2025-02-15 01:21:27</date>
+    <depth>0</depth>
+    <views>8</views>
+  </post>
+  <post>
+    <id>4</id>
+    <title>1</title>
+    <author>riz</author>
+    <content>1</content>
+    <date>2025-02-15 08:22:39</date>
+    <depth>0</depth>
+    <views>0</views>
+  </post>
+  <post>
+    <id>5</id>
+    <title>1</title>
+    <author>riz</author>
+    <content>1</content>
+    <date>2025-02-15 08:22:43</date>
+    <depth>0</depth>
+    <views>0</views>
+  </post>
+  <post>
+    <id>6</id>
+    <title>1</title>
+    <author>riz</author>
+    <content>1</content>
+    <date>2025-02-15 08:22:46</date>
+    <depth>0</depth>
+    <views>0</views>
+  </post>
+  <post>
+    <id>7</id>
+    <title>1</title>
+    <author>riz</author>
+    <content>1</content>
+    <date>2025-02-15 08:22:50</date>
+    <depth>0</depth>
+    <views>0</views>
+  </post>
+  <post>
+    <id>8</id>
+    <title>1</title>
+    <author>riz</author>
+    <content>1</content>
+    <date>2025-02-15 08:22:56</date>
+    <depth>0</depth>
+    <views>0</views>
+  </post>
+  <post>
+    <id>9</id>
+    <title>2</title>
+    <author>riz</author>
+    <content>2</content>
+    <date>2025-02-15 08:23:02</date>
+    <depth>0</depth>
+    <views>0</views>
+  </post>
+  <post>
+    <id>10</id>
+    <title>3</title>
+    <author>riz</author>
+    <content>3</content>
+    <date>2025-02-15 08:30:07</date>
+    <depth>0</depth>
+    <views>0</views>
+  </post>
+  <post>
+    <id>11</id>
+    <title>3</title>
+    <author>riz</author>
+    <content>3</content>
+    <date>2025-02-15 08:30:11</date>
     <depth>0</depth>
     <views>0</views>
   </post>
