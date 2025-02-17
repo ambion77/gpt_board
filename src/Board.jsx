@@ -200,7 +200,7 @@ function Board() {
                         <tr key={post.id}>
                             <td><input type="checkbox" checked={post.selected || false} onChange={() => toggleSelectPost(post.id)} /></td>
                             <td>{post.id}</td>
-                            <td className="leftArea"><a href="#" className="post-title" onClick={() => openPopup(post.id)}>{post.title}</a></td>
+                            <td className="leftArea" style={{ paddingLeft: `${post.depth * 20}px` }}><a href="#" className="post-title" onClick={() => openPopup(post.id)}>{post.title}</a></td>
                             <td>{post.author}</td>
                             <td>{post.views}</td>
                             <td>{post.date}</td>
