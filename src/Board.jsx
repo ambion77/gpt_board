@@ -11,6 +11,7 @@ function Board() {
     const [isReplyPopupOpen, setIsReplyPopupOpen] = useState(false);
     const [replyContent, setReplyContent] = useState('');
     const [newPost, setNewPost] = useState({ title: '', content: '' });
+    const [selectAll, setSelectAll] = useState(false);
 
     useEffect(() => {
         loadPosts(currentPage);
@@ -24,6 +25,15 @@ function Board() {
                 setCurrentPage(data.currentPage);
                 setTotalPages(data.totalPages);
             });
+    };
+
+    const toggleSelectAll = () => {
+        setSelectAll(!selectAll);
+        setPosts(posts.map(post => ({ ...post, selected: !selectAll })));
+    };
+
+    const toggleSelectPost = (postId) => {
+        setPosts(posts.map(post => post.id === postId ? { ...post, selected: !post.selected } : post));
     };
 
     const openPopup = (postId) => {
@@ -134,8 +144,9 @@ function Board() {
     };
 
     const deleteSelectedPosts = () => {
-        const checkedBoxes = document.querySelectorAll(".post-checkbox:checked");
-        const selectedIds = Array.from(checkedBoxes).map(cb => cb.value);
+        //const checkedBoxes = document.querySelectorAll(".post-checkbox:checked");
+        //const selectedIds = Array.from(checkedBoxes).map(cb => cb.value);
+        const selectedIds = posts.filter(post => post.selected).map(post => post.id);
 
         if (selectedIds.length === 0) {
             alert("❗ 삭제할 게시글을 선택하세요.");
@@ -176,7 +187,7 @@ function Board() {
             <table id="postTable">
                 <thead>
                     <tr>
-                        <th><input type="checkbox" id="selectAll" /></th>
+                        <th><input type="checkbox" onChange={toggleSelectAll} checked={selectAll} /></th>
                         <th>번호</th>
                         <th>제목</th>
                         <th>작성자</th>
@@ -187,7 +198,7 @@ function Board() {
                 <tbody>
                     {posts.map((post) => (
                         <tr key={post.id}>
-                            <td><input type="checkbox" className="post-checkbox" value={post.id} /></td>
+                            <td><input type="checkbox" checked={post.selected || false} onChange={() => toggleSelectPost(post.id)} /></td>
                             <td>{post.id}</td>
                             <td className="leftArea"><a href="#" className="post-title" onClick={() => openPopup(post.id)}>{post.title}</a></td>
                             <td>{post.author}</td>

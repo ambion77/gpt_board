@@ -158,15 +158,30 @@ app.post("/createPosts", verifyToken, (req, res) => {
 
 // 📌 목록에서 체크된 게시글 삭제
 app.post("/deletePosts", verifyToken,(req, res) => {
-    const { ids } = req.body;
+    const { ids } = req.body; // 선택된 ID 배열
     let data = readXML();
 
-    data.board.post = data.board.post.filter(post => 
-        !ids.includes( String(post.id) ) // 또는 Number(post.id)
-    );
+    console.log("📌 삭제 요청된 ID 목록:", ids);
+    
+    if (!Array.isArray(ids) || ids.length === 0) {
+        return res.status(400).json({ message: "⚠️ 삭제할 게시글을 선택하세요." });
+    }
 
+    // 기존 게시글 필터링 (ID가 선택된 목록에 없는 것만 남기기)
+    const originalLength = data.board.post.length;
+    data.board.post = data.board.post.filter(post => !ids.includes(Number(post.id)));
+
+    // 삭제된 개수 확인
+    const deletedCount = originalLength - data.board.post.length;
+
+    // 변경된 데이터 저장
     writeXML(data);
-    res.json({ message: "🗑️ 선택한 게시글 삭제 완료!" });
+
+    if (deletedCount > 0) {
+        res.json({ message: `🗑️ ${deletedCount}개의 게시글이 삭제되었습니다!` });
+    } else {
+        res.status(404).json({ message: "⚠️ 삭제할 게시글을 찾을 수 없습니다." });
+    }
 });
 
 // ✅ 게시글 삭제 (인증 필요)
