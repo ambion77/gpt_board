@@ -44,4 +44,6 @@
         FROM menu_tree
         ORDER BY sort_path;
     </query>
+    <query id="getImageList">SELECT id,image_name,base64_data,file_name FROM base64_images;</query>
+    <query id="getImageInfo">SELECT id,image_name,base64_data,width,height FROM base64_images WHERE id = ?;</query>
 </queries>

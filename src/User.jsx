@@ -27,6 +27,7 @@ const User = () => {
     return (
         <div className="user-container">
             <h1>사용자 정보</h1>
+            <h3>*POSTMAN이용 API호출(예: http://localhost:3000/api/users)로 CRUD됨</h3>
             {isLoading ? (
                 <p>로딩 중...</p>
             ) : error ? (

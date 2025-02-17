@@ -5,8 +5,10 @@ import { XMLParser, XMLBuilder } from "fast-xml-parser";
 import userRoutes from "./routes/userRoutes.js";
 import authRoutes from "./routes/authRoutes.js";
 import menuRoutes from "./routes/menuRoutes.js";
+import imageRoutes from "./routes/imageRoutes.js";
 import "dotenv/config";
 import jwt from "jsonwebtoken";
+import db from "./db.js"; // MySQL 연결 파일
 
 const app = express();
 const PORT = 3000;
@@ -17,7 +19,8 @@ app.use(express.static("public"));
 
 app.use("/api/users", userRoutes);  // 사용자 CRUD API 추가
 app.use("/api/auth", authRoutes); // 로그인 API 추가
-app.use("/api/menu", menuRoutes); // 로그인 API 추가
+app.use("/api/menu", menuRoutes); // menu API 추가
+app.use("/api/image", imageRoutes); // 이미지 API 추가
 
 const xmlFilePath = "board.xml";    // 📌 XML 파일 경로
 const POSTS_PER_PAGE = 10;  // 📌 한 페이지당 게시글 수
@@ -262,6 +265,14 @@ app.post("/addReply", verifyToken, (req, res) => {
     writeXML(data);
     res.json({ message: "✅ 답글이 성공적으로 추가되었습니다!" });
 });
+
+/*app.get("/getImages", (req, res) => {
+    db.query("SELECT base64_data FROM base64_images", (err, results) => {
+        if (err) return res.status(500).json({ error: err.message });
+        console.log('server.js getImages::'+results);
+        res.json(results);
+    });
+});*/
 
 // ✅ JWT 검증 미들웨어
 function verifyToken(req, res, next) {

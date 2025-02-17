@@ -2,15 +2,17 @@ import React, { useState } from "react";
 import MenuTree from "./MenuTree";
 import Board from "./Board";
 import User from "./User";
+import Images from "./Images";
 //import "./Menu.css";
 
 const menuData = [
     { "id": 1, "menuid": "M001", "menuname": "시스템관리", "depth": 0, "url": "" },
     { "id": 2, "menuid": "M00101", "menuname": "메뉴관리", "depth": 2, "url": "menuTree" },
     { "id": 3, "menuid": "M00102", "menuname": "사용자관리", "depth": 2, "url": "user" },
-    { "id": 4, "menuid": "M0010201", "menuname": "사용자추가삭제", "depth": 3, "url": "user_add_del.html" },
-    { "id": 5, "menuid": "M002", "menuname": "게시판관리", "depth": 0, "url": "" },
-    { "id": 6, "menuid": "M00201", "menuname": "REACT 게시판", "depth": 1, "url": "board" }
+    { "id": 4, "menuid": "M00103", "menuname": "이미지관리", "depth": 2, "url": "Images" },
+    { "id": 5, "menuid": "M0010201", "menuname": "사용자추가삭제", "depth": 3, "url": "user_add_del.html" },
+    { "id": 6, "menuid": "M002", "menuname": "게시판관리", "depth": 0, "url": "" },
+    { "id": 7, "menuid": "M00201", "menuname": "REACT 게시판", "depth": 1, "url": "board" }
 ];
 
 const MenuItem = ({ item, onSelect, activeMenu, setActiveMenu, setNavigator }) => {
@@ -25,6 +27,8 @@ const MenuItem = ({ item, onSelect, activeMenu, setActiveMenu, setNavigator }) =
                     onSelect(<MenuTree />);
                 }else if (item.menuid === "M00102") {
                     onSelect(<User />);
+                }else if (item.menuid === "M00103") {
+                    onSelect(<Images />);    
                 } else if (item.menuid === "M00201") {
                     onSelect(<Board />);
                 } else {
