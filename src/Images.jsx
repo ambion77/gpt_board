@@ -124,6 +124,9 @@ function ImageList() {
                         <th>ID</th>
                         <th>미리보기</th>
                         <th>파일명</th>
+                        <th>가로</th>
+                        <th>세로</th>
+                        <th>파일사이즈</th>
                         <th>보기</th>
                     </tr>
                 </thead>
@@ -146,6 +149,9 @@ function ImageList() {
                                 />
                             </td>
                             <td>{img.file_name}</td>
+                            <td>{img.width}</td>
+                            <td>{img.height}</td>
+                            <td>{img.size}</td>
                             <td>
                                 <button className="view-btn" onClick={() => openPopup(img.id)}>🔍 보기</button>
                             </td>
@@ -163,7 +169,34 @@ function ImageList() {
                         <img
                             src={`data:image/jpeg;base64,${selectedImage.base64_data}`}
                             alt={selectedImage.image_name}
-                            style={{ width: `${selectedImage.width}px`, height: `${selectedImage.height}px` }}
+                            style={{ 
+                                ...(() => {
+                                  const maxSize = 500;
+                                  const originalWidth = selectedImage.width;
+                                  const originalHeight = selectedImage.height;
+                                  
+                                  // 원본 크기가 300px 이하인 경우
+                                  if (originalWidth <= maxSize && originalHeight <= maxSize) {
+                                    return {
+                                      width: `${originalWidth}px`,
+                                      height: `${originalHeight}px`
+                                    };
+                                  }
+                                  
+                                  // 비율 계산 (더 긴 쪽을 300px로 고정)
+                                  const scaleRatio = Math.min(
+                                    maxSize / originalWidth,
+                                    maxSize / originalHeight
+                                  );
+                                  
+                                  return {
+                                    width: `${Math.floor(originalWidth * scaleRatio)}px`,
+                                    height: `${Math.floor(originalHeight * scaleRatio)}px`,
+                                    maxWidth: `${maxSize}px`,
+                                    maxHeight: `${maxSize}px`
+                                  };
+                                })()
+                              }}
                         />
                         <button className="download-btn" onClick={downloadImage}>📥 다운로드</button>
                     </div>

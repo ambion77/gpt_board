@@ -54,8 +54,11 @@ router.post("/uploadImage", upload.single("image"), async (req, res) => {
     const metadata = await sharp(req.file.path).metadata(); //이미지 메타데이터 가져오기 (너비, 높이) 
     const file_width = metadata.width;
     const file_height = metadata.height;    
+    const file_size = req.file.size; // 파일 크기
+    console.log('req.file:', req.file);
+    console.log('mimetype:', req.file.mimetype);
 
-    await db.query(queries.insertImage, [originalname,originalname, base64Image, file_width, file_height]);
+    await db.query(queries.insertImage, [originalname,originalname, base64Image, file_width, file_height,file_size]);
 
     // 임시 파일 삭제
     fs.unlinkSync(filePath);
