@@ -5,18 +5,38 @@ function ImageList() {
     const [images, setImages] = useState([]);
     const [selectedImages, setSelectedImages] = useState([]);
     const [selectedImage, setSelectedImage] = useState(null);
+    const [currentPage, setCurrentPage] = useState(1);  // 현재 페이지
+    const [pageSize, setPageSize] = useState(5);  // 한 페이지에 보여줄 이미지 수
+    //const [totalImages, setTotalImages] = useState(0);  // 총 이미지 수
+    const [pagination, setPagination] = useState({
+        currentPage: 1,
+        totalPages: 1,
+        previousPage: null,
+        nextPage: null,
+        totalImages: 0,
+    });
 
-    // 이미지 목록을 갱신하는 함수
-    const refreshImages = async () => {
+    // 이미지 목록을 갱신하는 함수 (페이징 적용)
+    // 이미지를 새로 불러오는 함수 (페이징을 고려한 새로고침)
+    const refreshImages = async (page = currentPage) => {
         try {
-            const response = await fetch("http://localhost:3000/api/image/getImageList");
+            const response = await fetch(`http://localhost:3000/api/image/getImageList?page=${page}&limit=${pageSize}`);
             const data = await response.json();
-            console.log("서버 응답 데이터1:", data); // 🔍 데이터 구조 확인
-            setImages(data);
+            setImages(data.images);
+            
+            if (data.pagination && data.pagination.totalPages) {
+                setPagination(data.pagination);  // pagination 정보가 유효한 경우에만 설정
+            } else {
+                console.error("Pagination 데이터가 없거나 잘못되었습니다.");
+            }
         } catch (error) {
-            console.error("Error fetching images:", error);
+        console.error("Error fetching images:", error);
         }
     };
+
+    useEffect(() => {
+        refreshImages(currentPage);  // 페이지 로드시 이미지 목록을 갱신
+    }, [currentPage]);
 
     const handleCheckboxChange = (id) => {
         setSelectedImages((prev) =>
@@ -39,23 +59,26 @@ function ImageList() {
         }
 
         try {
+            // 현재 페이지와 limit을 가져옵니다.
+            const page = currentPage; // 현재 페이지
+            const limit = 5;  // 한 페이지에 보여줄 이미지 수
             const response = await fetch("http://localhost:3000/api/image/deleteImages", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ imageIds: selectedImages }),
+                body: JSON.stringify({ 
+                    imageIds: selectedImages,
+                    page: page,
+                    limit: limit }),
             });
             const data = await response.json();
             alert(data.message);
-            setImages(images.filter((img) => !selectedImages.includes(img.id)));
-            setSelectedImages([]);
+            // 삭제된 후 이미지 목록을 갱신합니다.
+            refreshImages(page);  // 삭제된 후 이미지 목록 갱신
+            setSelectedImages([]);  // 선택된 이미지 초기화
         } catch (error) {
             console.error("삭제 실패:", error);
         }
     };
-
-    useEffect(() => {
-        refreshImages();  // 페이지 로드시 이미지 목록을 갱신
-    }, []);
 
     const openPopup = (id) => {
         fetch(`http://localhost:3000/api/image/getImageInfo/${id}`)
@@ -99,6 +122,13 @@ function ImageList() {
         }
     };
 
+    // 페이지를 변경할 때 호출되는 함수
+    const handlePageChange = (newPage) => {
+        if (newPage < 1 || newPage > pagination.totalPages) return;  // 페이지 범위 체크
+        setCurrentPage(newPage);  // 현재 페이지 업데이트
+        refreshImages(newPage);   // 페이지 변경 시 이미지 갱신
+    };
+
     return (
         <div>
             <h1>📋 이미지 목록</h1>
@@ -108,8 +138,6 @@ function ImageList() {
                 <button onClick={handleDelete}>삭제</button>
             </div>
 
-            {/* 전체 선택 체크박스 */}
-            
             {/* 이미지 목록 테이블 */}
             <table className="image-table">
                 <thead>
@@ -159,6 +187,17 @@ function ImageList() {
                     ))}
                 </tbody>
             </table>
+
+            {/* 페이지 네비게이션 */}
+            <div className="pageArea">
+                {pagination.previousPage && (
+                    <button onClick={() => handlePageChange(pagination.previousPage)}>이전</button>
+                )}
+                &nbsp;&nbsp;<span> {pagination.currentPage || 1} / {pagination.totalPages || 1} </span>&nbsp;&nbsp;{/* 값이 없을 경우 1로 기본 설정 */}
+                {pagination.nextPage && (
+                    <button onClick={() => handlePageChange(pagination.nextPage)}>다음</button>
+                )}
+            </div>
 
             {/* 상세 이미지 팝업 */}
             {selectedImage && (
