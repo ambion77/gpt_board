@@ -1,8 +1,10 @@
 import express from "express";
 import multer from "multer";
-import fs from "fs";
+import sharp from "sharp";  // metadata를 위한 이미지 처리 모듈
+import fs from "fs";  // 파일 시스템 모듈
 import db from "../db.js"; // MySQL 연결 파일
 import loadQueries from "../queryLoader.js"; // XML 기반 쿼리 로더
+import path from "path";
 
 const router = express.Router();
 const upload = multer({ dest: "uploads/" }); // 업로드 폴더 설정
@@ -49,7 +51,11 @@ router.post("/uploadImage", upload.single("image"), async (req, res) => {
 
     // DB 저장
     const { originalname } = req.file;
-    await db.query(queries.insertImage, [originalname,originalname, base64Image]);
+    const metadata = await sharp(req.file.path).metadata(); //이미지 메타데이터 가져오기 (너비, 높이) 
+    const file_width = metadata.width;
+    const file_height = metadata.height;    
+
+    await db.query(queries.insertImage, [originalname,originalname, base64Image, file_width, file_height]);
 
     // 임시 파일 삭제
     fs.unlinkSync(filePath);
@@ -59,5 +65,28 @@ router.post("/uploadImage", upload.single("image"), async (req, res) => {
     res.status(500).json({ message: "이미지 업로드 실패", error: err });
   }
 });
+
+// 이미지 삭제 API
+router.post("/deleteImages", async (req, res) => {
+  try {
+    const { imageIds } = req.body;
+    console.log('imageIds:', imageIds);
+
+    if (!imageIds || imageIds.length == 0) {
+      return res.status(400).json({ message: "삭제할 이미지가 없습니다." });
+    }
+
+    // 숫자 배열로 변환
+    const ids = imageIds.map(id => parseInt(id, 10)); 
+
+    // DB에서 여러 개의 id를 삭제
+    await db.query(queries.deleteImages, [ids]);
+
+    res.json({ message: "선택한 이미지가 삭제되었습니다." });
+  } catch (err) {
+    res.status(500).json({ message: "이미지 삭제 실패", error: err });
+  }
+});
+
 
 export default router;

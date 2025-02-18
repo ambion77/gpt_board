@@ -3,30 +3,58 @@ import ImageUpload from "./ImageUpload";
 
 function ImageList() {
     const [images, setImages] = useState([]);
+    const [selectedImages, setSelectedImages] = useState([]);
     const [selectedImage, setSelectedImage] = useState(null);
 
     // 이미지 목록을 갱신하는 함수
-    const refreshImages = () => {
-        // 이미지 목록 다시 불러오기
-        useEffect(() => {
-            fetch("http://localhost:3000/api/image/getImageList") // ID와 제목만 가져오기
-                .then((response) => response.json())
-                .then((data) => {
-                    console.log("서버 응답 데이터1:", data); // 🔍 데이터 구조 확인
-                    setImages(data);
-                })
-                .catch((error) => console.error("Error fetching images:", error));
-        }, []);
+    const refreshImages = async () => {
+        try {
+            const response = await fetch("http://localhost:3000/api/image/getImageList");
+            const data = await response.json();
+            console.log("서버 응답 데이터1:", data); // 🔍 데이터 구조 확인
+            setImages(data);
+        } catch (error) {
+            console.error("Error fetching images:", error);
+        }
+    };
+
+    const handleCheckboxChange = (id) => {
+        setSelectedImages((prev) =>
+            prev.includes(id) ? prev.filter((imageId) => imageId !== id) : [...prev, id]
+        );
+    };
+
+    const handleSelectAll = () => {
+        if (selectedImages.length === images.length) {
+            setSelectedImages([]);  // 모두 선택된 상태라면 선택 해제
+        } else {
+            setSelectedImages(images.map((img) => img.id));  // 모든 이미지 선택
+        }
+    };
+
+    const handleDelete = async () => {
+        if (selectedImages.length === 0) {
+            alert("삭제할 이미지를 선택해주세요.");
+            return;
+        }
+
+        try {
+            const response = await fetch("http://localhost:3000/api/image/deleteImages", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ imageIds: selectedImages }),
+            });
+            const data = await response.json();
+            alert(data.message);
+            setImages(images.filter((img) => !selectedImages.includes(img.id)));
+            setSelectedImages([]);
+        } catch (error) {
+            console.error("삭제 실패:", error);
+        }
     };
 
     useEffect(() => {
-        fetch("http://localhost:3000/api/image/getImageList") // ID와 제목만 가져오기
-            .then((response) => response.json())
-            .then((data) => {
-                console.log("서버 응답 데이터1:", data); // 🔍 데이터 구조 확인
-                setImages(data);
-            })
-            .catch((error) => console.error("Error fetching images:", error));
+        refreshImages();  // 페이지 로드시 이미지 목록을 갱신
     }, []);
 
     const openPopup = (id) => {
@@ -73,17 +101,28 @@ function ImageList() {
 
     return (
         <div>
-            <ImageUpload onUploadSuccess={refreshImages} />
             <h1>📋 이미지 목록</h1>
-            <h3>base64로 저장된 데이터를 이미지로 불러옴</h3>
+            <div className="image-upload">
+                <div><h3>base64로 저장된 데이터를 이미지로 불러옴</h3></div>
+                <ImageUpload onUploadSuccess={refreshImages} />&nbsp;
+                <button onClick={handleDelete}>삭제</button>
+            </div>
 
+            {/* 전체 선택 체크박스 */}
+            
             {/* 이미지 목록 테이블 */}
             <table className="image-table">
                 <thead>
                     <tr>
+                        <th>
+                            <input
+                                type="checkbox"
+                                checked={selectedImages.length === images.length}  // 모든 이미지가 선택되었을 때 체크
+                                onChange={handleSelectAll}
+                            />
+                        </th>
                         <th>ID</th>
                         <th>미리보기</th>
-                        <th>이미지 이름</th>
                         <th>파일명</th>
                         <th>보기</th>
                     </tr>
@@ -91,6 +130,13 @@ function ImageList() {
                 <tbody>
                     {images.map((img) => (
                         <tr key={img.id}>
+                            <td>
+                                <input
+                                    type="checkbox"
+                                    checked={selectedImages.includes(img.id)}
+                                    onChange={() => handleCheckboxChange(img.id)}
+                                />
+                            </td>
                             <td>{img.id}</td>
                             <td>
                                 <img
@@ -99,7 +145,6 @@ function ImageList() {
                                     className="thumbnail"
                                 />
                             </td>
-                            <td>{img.image_name}</td>
                             <td>{img.file_name}</td>
                             <td>
                                 <button className="view-btn" onClick={() => openPopup(img.id)}>🔍 보기</button>

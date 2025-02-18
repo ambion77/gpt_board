@@ -599,3 +599,11 @@ input[type="checkbox"] {
 .view-btn:hover {
   background-color: #0056b3;
 }
+
+.image-upload{
+  white-space: nowrap;  /* 텍스트가 줄 바꿈 되지 않도록 */
+  display: flex; /* 버튼을 인라인 블록으로 설정 */
+  width: auto;           /* 너비가 자동으로 조정되도록 */
+  height: 45px;
+  margin-left: auto;     /* 왼쪽 여백을 자동으로 설정 */
+}

@@ -1,18 +1,12 @@
-import React, { useState } from "react";
+import React, { useRef } from "react";
 
 function ImageUpload({ onUploadSuccess }) {
-    const [file, setFile] = useState(null);
+    const fileInputRef = useRef(null);
 
-    const handleFileChange = (event) => {
-        setFile(event.target.files[0]);
-    };
+    const handleFileChange = async (event) => {
+        const file = event.target.files[0];
+        if (!file) return;
 
-    const handleUpload = async () => {
-        if (!file) {
-            alert("파일을 선택해주세요.");
-            return;
-        }
-        
         const formData = new FormData();
         formData.append("image", file);
 
@@ -23,17 +17,23 @@ function ImageUpload({ onUploadSuccess }) {
             });
             const data = await response.json();
             alert(data.message);
-            onUploadSuccess(); // 업로드 후 이미지 목록 갱신
+            onUploadSuccess();
         } catch (error) {
             console.error("업로드 실패:", error);
         }
     };
 
     return (
-        <div>
-            <h2>📤 이미지 업로드</h2>
-            <input type="file" onChange={handleFileChange} />
-            <button onClick={handleUpload}>업로드</button>
+        <div className="image-upload">
+            <input
+                type="file"
+                ref={fileInputRef}
+                onChange={handleFileChange}
+                style={{ display: "none" }}
+            />
+            <button onClick={() => fileInputRef.current.click()}>
+                추가
+            </button>
         </div>
     );
 }

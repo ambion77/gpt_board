@@ -48,7 +48,8 @@
     <query id="getImageInfo">SELECT id,image_name,base64_data,width,height FROM base64_images WHERE id = ?;</query>
     <query id="insertImage">
     INSERT INTO base64_images
-    (image_name, file_name, base64_data)
-    VALUES(?, ?, ?);
-    </query>   
+    (image_name, file_name, base64_data,width, height)
+    VALUES(?, ?, ?, ?, ?);
+    </query>
+    <query id="deleteImages">DELETE FROM base64_images WHERE id IN (?);</query>
 </queries>
