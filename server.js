@@ -8,7 +8,6 @@ import menuRoutes from "./routes/menuRoutes.js";
 import imageRoutes from "./routes/imageRoutes.js";
 import "dotenv/config";
 import jwt from "jsonwebtoken";
-import db from "./db.js"; // MySQL 연결 파일
 
 const app = express();
 const PORT = 3000;
@@ -265,14 +264,6 @@ app.post("/addReply", verifyToken, (req, res) => {
     writeXML(data);
     res.json({ message: "✅ 답글이 성공적으로 추가되었습니다!" });
 });
-
-/*app.get("/getImages", (req, res) => {
-    db.query("SELECT base64_data FROM base64_images", (err, results) => {
-        if (err) return res.status(500).json({ error: err.message });
-        console.log('server.js getImages::'+results);
-        res.json(results);
-    });
-});*/
 
 // ✅ JWT 검증 미들웨어
 function verifyToken(req, res, next) {

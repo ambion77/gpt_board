@@ -1,8 +1,23 @@
 import React, { useState, useEffect } from "react";
+import ImageUpload from "./ImageUpload";
 
 function ImageList() {
     const [images, setImages] = useState([]);
     const [selectedImage, setSelectedImage] = useState(null);
+
+    // 이미지 목록을 갱신하는 함수
+    const refreshImages = () => {
+        // 이미지 목록 다시 불러오기
+        useEffect(() => {
+            fetch("http://localhost:3000/api/image/getImageList") // ID와 제목만 가져오기
+                .then((response) => response.json())
+                .then((data) => {
+                    console.log("서버 응답 데이터1:", data); // 🔍 데이터 구조 확인
+                    setImages(data);
+                })
+                .catch((error) => console.error("Error fetching images:", error));
+        }, []);
+    };
 
     useEffect(() => {
         fetch("http://localhost:3000/api/image/getImageList") // ID와 제목만 가져오기
@@ -58,6 +73,7 @@ function ImageList() {
 
     return (
         <div>
+            <ImageUpload onUploadSuccess={refreshImages} />
             <h1>📋 이미지 목록</h1>
             <h3>base64로 저장된 데이터를 이미지로 불러옴</h3>
 

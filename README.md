@@ -33,6 +33,33 @@ CREATE TABLE users (
     password VARCHAR(255) NOT NULL
 );
 
+CREATE TABLE menu (
+  menu_id int NOT NULL AUTO_INCREMENT,
+  menu_code varchar(20) NOT NULL,
+  menu_name varchar(255) NOT NULL,
+  parent_id int DEFAULT NULL,
+  depth tinyint unsigned NOT NULL,
+  url varchar(255) DEFAULT NULL,
+  sort_order smallint unsigned NOT NULL,
+  created_date timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_date timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (menu_id),
+  UNIQUE KEY menu_code (menu_code),
+  KEY parent_id (parent_id),
+  CONSTRAINT menu_ibfk_1 FOREIGN KEY (parent_id) REFERENCES menu (menu_id) ON DELETE CASCADE
+) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+CREATE TABLE base64_images (
+    id INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    image_name VARCHAR(255) NOT NULL,
+    file_name VARCHAR(100) NOT NULL,
+    base64_data LONGTEXT NOT NULL,
+    width int,
+    height int,
+    created_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,    
+    INDEX idx_image_name (image_name)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
 3-4. 데이터 입력
 
 INSERT INTO my_data.users
