@@ -5,10 +5,12 @@ const User = () => {
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState(null);
 
+    const apiUrl = import.meta.env.VITE_API_URL;    // Vite 환경 변수 사용(꼭VITE라는명으로 시작해야함)
+
     useEffect(() => {
         const fetchUsers = async () => {
             try {
-                const response = await fetch("http://localhost:3000/api/users");
+                const response = await fetch(`${apiUrl}/api/users`);
                 if (!response.ok) {
                     throw new Error("데이터를 불러오는데 실패했습니다.");
                 }

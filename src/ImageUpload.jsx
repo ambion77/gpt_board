@@ -2,6 +2,8 @@ import React, { useRef } from "react";
 
 function ImageUpload({ onUploadSuccess }) {
     const fileInputRef = useRef(null);
+    
+    const apiUrl = import.meta.env.VITE_API_URL;    // Vite 환경 변수 사용(꼭VITE라는명으로 시작해야함)
 
     const handleFileChange = async (event) => {
         const file = event.target.files[0];
@@ -11,7 +13,7 @@ function ImageUpload({ onUploadSuccess }) {
         formData.append("image", file);
 
         try {
-            const response = await fetch("http://localhost:3000/api/image/uploadImage", {
+            const response = await fetch(`${apiUrl}/api/image/uploadImage`, {
                 method: "POST",
                 body: formData,
             });

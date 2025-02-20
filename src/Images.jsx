@@ -16,11 +16,13 @@ function ImageList() {
         totalImages: 0,
     });
 
+    const apiUrl = import.meta.env.VITE_API_URL;    // Vite 환경 변수 사용(꼭VITE라는명으로 시작해야함)
+
     // 이미지 목록을 갱신하는 함수 (페이징 적용)
     // 이미지를 새로 불러오는 함수 (페이징을 고려한 새로고침)
     const refreshImages = async (page = currentPage) => {
         try {
-            const response = await fetch(`http://localhost:3000/api/image/getImageList?page=${page}&limit=${pageSize}`);
+            const response = await fetch(`${apiUrl}/api/image/getImageList?page=${page}&limit=${pageSize}`);
             const data = await response.json();
             setImages(data.images);
             
@@ -62,7 +64,7 @@ function ImageList() {
             // 현재 페이지와 limit을 가져옵니다.
             const page = currentPage; // 현재 페이지
             const limit = 5;  // 한 페이지에 보여줄 이미지 수
-            const response = await fetch("http://localhost:3000/api/image/deleteImages", {
+            const response = await fetch(`${apiUrl}/api/image/deleteImages`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ 
@@ -81,7 +83,7 @@ function ImageList() {
     };
 
     const openPopup = (id) => {
-        fetch(`http://localhost:3000/api/image/getImageInfo/${id}`)
+        fetch(`${apiUrl}/api/image/getImageInfo/${id}`)
             .then((response) => response.json())
             .then((data) => {
                 console.log("서버 응답 데이터:", data[0]); // 🔍 데이터 구조 확인

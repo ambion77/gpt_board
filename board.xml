@@ -25,9 +25,20 @@
     <id>3</id>
     <title>문의드립니다.</title>
     <author>riz</author>
-    <content>문의드립니다.</content>
+    <content>문의드립니다.
+수정했습니다.</content>
     <date>2025-02-15 01:21:27</date>
     <depth>0</depth>
-    <views>11</views>
+    <views>15</views>
+  </post>
+  <post>
+    <id>4</id>
+    <parentId>3</parentId>
+    <depth>1</depth>
+    <title>Re:문의드립니다.</title>
+    <author>riz</author>
+    <content>답글입니다.</content>
+    <date>2025-02-20 16:41:28</date>
+    <views>0</views>
   </post>
 </board>

@@ -13,12 +13,14 @@ function Board() {
     const [newPost, setNewPost] = useState({ title: '', content: '' });
     const [selectAll, setSelectAll] = useState(false);
 
+    const apiUrl = import.meta.env.VITE_API_URL;    // Vite 환경 변수 사용(꼭VITE라는명으로 시작해야함)
+
     useEffect(() => {
         loadPosts(currentPage);
     }, [currentPage]);
 
     const loadPosts = (page) => {
-        fetch(`http://localhost:3000/posts?page=${page}`)
+        fetch(`${apiUrl}/posts?page=${page}`)
             .then(response => response.json())
             .then(data => {
                 setPosts(data.posts);
@@ -37,7 +39,7 @@ function Board() {
     };
 
     const openPopup = (postId) => {
-        fetch(`http://localhost:3000/post/${postId}`)
+        fetch(`${apiUrl}/post/${postId}`)
             .then(response => response.json())
             .then(post => {
                 setPopupData(post);
@@ -73,7 +75,7 @@ function Board() {
             return;
         }
 
-        fetch("http://localhost:3000/createPosts", {
+        fetch(`${apiUrl}/createPosts`, {
             method: "POST",
             headers: { "Content-Type": "application/json", "Authorization": `Bearer ${localStorage.getItem("jwt")}` },
             body: JSON.stringify(newPost),
@@ -88,7 +90,7 @@ function Board() {
     const updatePost = () => {
         const updatedPost = { ...popupData, title: document.getElementById('editTitle').value, content: document.getElementById('editContent').value };
 
-        fetch("http://localhost:3000/updatePosts", {
+        fetch(`${apiUrl}/updatePosts`, {
             method: "POST",
             headers: { "Content-Type": "application/json", "Authorization": `Bearer ${localStorage.getItem("jwt")}` },
             body: JSON.stringify(updatedPost),
@@ -103,7 +105,7 @@ function Board() {
     const deletePost = () => {
         if (!confirm("정말 이 게시글을 삭제하시겠습니까?")) return;
 
-        fetch(`http://localhost:3000/deletePost/${popupData.id}`, {
+        fetch(`${apiUrl}/deletePost/${popupData.id}`, {
             method: "DELETE",
             headers: { "Content-Type": "application/json", "Authorization": `Bearer ${localStorage.getItem("jwt")}` },
         })
@@ -131,7 +133,7 @@ function Board() {
 
         const reply = { postId: popupData.id, content: replyContent };
 
-        fetch("http://localhost:3000/addReply", {
+        fetch(`${apiUrl}/addReply`, {
             method: "POST",
             headers: { "Content-Type": "application/json", "Authorization": `Bearer ${localStorage.getItem("jwt")}` },
             body: JSON.stringify(reply),
@@ -153,7 +155,7 @@ function Board() {
             return;
         }
 
-        fetch("http://localhost:3000/deletePosts", {
+        fetch(`${apiUrl}/deletePosts`, {
             method: "POST",
             headers: { "Content-Type": "application/json", "Authorization": `Bearer ${localStorage.getItem("jwt")}` },
             body: JSON.stringify({ ids: selectedIds }),
