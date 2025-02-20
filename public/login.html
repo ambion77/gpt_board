@@ -31,7 +31,11 @@
             const userid = document.getElementById("userid").value;
             const password = document.getElementById("password").value;
 
-            const response = await fetch("http://localhost:3000/api/auth/login", {
+            const apiBaseUrl = window.location.hostname === "localhost" 
+                ? "http://localhost:3000" 
+                : "";
+
+            const response = await fetch(`${apiBaseUrl}/api/auth/login`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" ,Authorization: `Bearer ${localStorage.getItem("jwt")}`,},
                 body: JSON.stringify({ userid, password })

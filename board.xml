@@ -41,4 +41,13 @@
     <date>2025-02-20 16:41:28</date>
     <views>0</views>
   </post>
+  <post>
+    <id>5</id>
+    <title>xml로 저장되는 게시판</title>
+    <author>admin</author>
+    <content>xml로 저장되는 게시판입니다.</content>
+    <date>2025-02-20 17:19:24</date>
+    <depth>0</depth>
+    <views>0</views>
+  </post>
 </board>
