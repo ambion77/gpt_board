@@ -4,7 +4,8 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "concurrently \"vite\" \"node server.js\"",
+    "dev": "concurrently \"vite --host\" \"node server.js\"",
+     "//": "//는 주석이란 뜻. 실행시 concurrently는 vite 서버와 node 서버를 동시에 실행한다는 뜻.vite는 5173포트, node는 3000포트로 실행",
     "build": "vite build",
     "lint": "eslint .",
     "preview": "vite preview"
