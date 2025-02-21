@@ -8,6 +8,24 @@ import menuRoutes from "./routes/menuRoutes.js";
 import imageRoutes from "./routes/imageRoutes.js";
 import "dotenv/config";
 import jwt from "jsonwebtoken";
+import winston from "winston";
+//import expressWinston from "express-winston";   // 📌 Winston 로깅 미들웨어 추가
+
+const logger = winston.createLogger({
+    level: 'info',
+    format: winston.format.combine(
+        winston.format.timestamp(),
+        winston.format.json()
+    ),
+    transports: [
+        new winston.transports.Console(),
+        new winston.transports.File({ filename: 'app.log' })
+    ]
+});
+
+logger.info("서버 시작됨");
+logger.warn("경고 메시지");
+logger.error("에러 발생!");
 
 const app = express();
 const PORT = 3000;

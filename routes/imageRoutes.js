@@ -5,6 +5,19 @@ import fs from "fs";  // 파일 시스템 모듈
 import db from "../db.js"; // MySQL 연결 파일
 import loadQueries from "../queryLoader.js"; // XML 기반 쿼리 로더
 import path from "path";
+import winston from "winston";
+
+const logger = winston.createLogger({
+    level: 'info',
+    format: winston.format.combine(
+        winston.format.timestamp(),
+        winston.format.json()
+    ),
+    transports: [
+        new winston.transports.Console(),
+        new winston.transports.File({ filename: 'app.log' })
+    ]
+});
 
 const router = express.Router();
 const upload = multer({ dest: "uploads/" }); // 업로드 폴더 설정
@@ -92,6 +105,7 @@ router.post("/uploadImage", upload.single("image"), async (req, res) => {
 
     res.json({ message: "이미지가 성공적으로 업로드되었습니다." });
   } catch (err) {
+    logger.error("uploadImage "+err);
     res.status(500).json({ message: "이미지 업로드 실패", error: err });
   }
 });

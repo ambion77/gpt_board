@@ -3,6 +3,19 @@ import db from "../db.js"; // MySQL 연결 파일
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import loadQueries from "../queryLoader.js"; // XML 기반 쿼리 로더
+import winston from "winston";  // 📌 Winston 로깅 추가
+
+const logger = winston.createLogger({
+    level: 'info',
+    format: winston.format.combine(
+        winston.format.timestamp(),
+        winston.format.json()
+    ),
+    transports: [
+        new winston.transports.Console(),
+        new winston.transports.File({ filename: 'app.log' })
+    ]
+});
 
 const router = express.Router();
 let queries = {};
@@ -48,6 +61,7 @@ router.post("/login", async (req, res) => {
 
     res.json({ message: "로그인 성공", token });
   } catch (err) {
+    logger.error("로그인 중 오류 발생:", err);
     console.error("로그인 중 오류 발생:", err);
     res.status(500).json({ message: "서버 오류", error: err });
   }
