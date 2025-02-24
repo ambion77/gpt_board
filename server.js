@@ -6,10 +6,10 @@ import userRoutes from "./routes/userRoutes.js";
 import authRoutes from "./routes/authRoutes.js";
 import menuRoutes from "./routes/menuRoutes.js";
 import imageRoutes from "./routes/imageRoutes.js";
+import boardRoutes from "./routes/boardRoutes.js";
 import "dotenv/config";
 import jwt from "jsonwebtoken";
 import winston from "winston";
-//import expressWinston from "express-winston";   // 📌 Winston 로깅 미들웨어 추가
 
 const logger = winston.createLogger({
     level: 'info',
@@ -23,21 +23,24 @@ const logger = winston.createLogger({
     ]
 });
 
-logger.info("서버 시작됨");
-logger.warn("경고 메시지");
-logger.error("에러 발생!");
-
 const app = express();
 const PORT = 3000;
 
 app.use(express.json());
-app.use(cors());
+//app.use(cors());  //파일다운로드시 파일명을 전달하려면 Content-Disposition설정이 필요함
+app.use(cors({
+    origin: 'http://localhost:5173',
+    credentials: true,
+    exposedHeaders: ['Content-Disposition']
+  }))
 app.use(express.static("public"));
+app.use('/uploads', express.static('uploads'));
 
 app.use("/api/users", userRoutes);  // 사용자 CRUD API 추가
 app.use("/api/auth", authRoutes); // 로그인 API 추가
 app.use("/api/menu", menuRoutes); // menu API 추가
 app.use("/api/image", imageRoutes); // 이미지 API 추가
+app.use("/api/board", boardRoutes); // 게시판 API 추가
 
 const xmlFilePath = "board.xml";    // 📌 XML 파일 경로
 const POSTS_PER_PAGE = 10;  // 📌 한 페이지당 게시글 수

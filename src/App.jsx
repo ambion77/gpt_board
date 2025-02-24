@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import MenuTree from "./MenuTree";
 import Board from "./Board";
+import BoardList from "./BoardList";
 import User from "./User";
 import Images from "./Images";
 //import "./Menu.css";
@@ -12,7 +13,8 @@ const menuData = [
     { "id": 4, "menuid": "M00103", "menuname": "이미지관리", "depth": 2, "url": "Images" },
     { "id": 5, "menuid": "M0010201", "menuname": "사용자추가삭제", "depth": 3, "url": "user_add_del.html" },
     { "id": 6, "menuid": "M002", "menuname": "게시판관리", "depth": 0, "url": "" },
-    { "id": 7, "menuid": "M00201", "menuname": "REACT 게시판", "depth": 1, "url": "board" }
+    { "id": 7, "menuid": "M00201", "menuname": "XML REACT 게시판", "depth": 1, "url": "board" },
+    { "id": 8, "menuid": "M00202", "menuname": "DB REACT 게시판", "depth": 1, "url": "BoardList" }
 ];
 
 const MenuItem = ({ item, onSelect, activeMenu, setActiveMenu, setNavigator }) => {
@@ -31,6 +33,8 @@ const MenuItem = ({ item, onSelect, activeMenu, setActiveMenu, setNavigator }) =
                     onSelect(<Images />);    
                 } else if (item.menuid === "M00201") {
                     onSelect(<Board />);
+                } else if (item.menuid === "M00202") {
+                    onSelect(<BoardList />);
                 } else {
                     onSelect(null);
                 }

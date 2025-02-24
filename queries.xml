@@ -55,4 +55,29 @@
         (?, ?, ?, ?, ?, ?);
     </query>
     <query id="deleteImages">DELETE FROM base64_images WHERE id IN (?);</query>
+
+    <query id="getBoardListWithPaginationCount">SELECT count(*) as totalCount FROM board;</query>
+    <query id="getBoardListWithPagination">
+        SELECT b.id, b.title, b.content, b.author, b.views, DATE_FORMAT(b.created_date, "%Y/%m/%d %T") as created_date
+        FROM board b
+        order by b.created_date desc LIMIT ? OFFSET ? ;
+    </query>
+    <query id="getBoardInfo">
+        SELECT b.id, b.title, b.content, b.author , bf.id as file_id ,bf.file_path, bf.file_type, bf.file_name
+        FROM board b left outer JOIN  board_file bf ON b.id = bf.board_id 
+        WHERE b.id = ?;</query>
+    <query id="insertBoard">
+        INSERT INTO board
+        (title, content, author,views)
+        VALUES
+        (?, ?, ?, 0);
+    </query>
+    <query id="insertBoardFile">
+        INSERT INTO board_file
+        (board_id, file_name, file_type, file_path, file_size)
+        VALUES
+        (?, ?, ?, ?, ?);
+    </query>
+    <query id="deleteBoards">DELETE FROM board WHERE id IN (?);</query>
+    <query id="deleteBoardsFile">DELETE FROM board_file WHERE board_id IN (?);</query>
 </queries>
