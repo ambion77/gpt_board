@@ -1,7 +1,14 @@
 import mysql from "mysql2/promise";
 import dotenv from "dotenv";
 
-dotenv.config(); // .env 파일 로드
+//dotenv.config(); // .env 파일 로드
+
+// NODE_ENV에 따라 다른 .env 파일을 로드
+if (process.env.NODE_ENV === 'prd') {
+  dotenv.config({ path: '.prd.env' });
+} else {
+  dotenv.config({ path: '.dev.env' });
+}
 
 const pool = mysql.createPool({
   host: process.env.DB_HOST, // MySQL 서버 주소

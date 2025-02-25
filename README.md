@@ -60,6 +60,25 @@ CREATE TABLE base64_images (
     INDEX idx_image_name (image_name)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
+CREATE TABLE board (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  title VARCHAR(255) NOT NULL,
+  content TEXT NOT NULL,
+  author VARCHAR(100) NOT NULL,
+  views INT DEFAULT 0,
+  created_date DATETIME DEFAULT CURRENT_TIMESTAMP,
+  updated_date DATETIME DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE board_file (
+  id INT PRIMARY KEY AUTO_INCREMENT,
+  board_id INT, 
+  file_name VARCHAR(255),
+  file_type VARCHAR(50),
+  file_size int,
+  file_path VARCHAR(255)
+);
+
 3-4. 데이터 입력
 
 INSERT INTO my_data.users

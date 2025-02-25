@@ -10,6 +10,7 @@ import boardRoutes from "./routes/boardRoutes.js";
 import "dotenv/config";
 import jwt from "jsonwebtoken";
 import winston from "winston";
+import dotenv from "dotenv";
 
 const logger = winston.createLogger({
     level: 'info',
@@ -23,13 +24,21 @@ const logger = winston.createLogger({
     ]
 });
 
+//dotenv.config(); // .env 파일 로드
+// NODE_ENV에 따라 다른 .env 파일을 로드
+if (process.env.NODE_ENV === 'prd') {
+  dotenv.config({ path: '.prd.env' });
+} else {
+  dotenv.config({ path: '.dev.env' });
+}
+
 const app = express();
 const PORT = 3000;
 
 app.use(express.json());
 //app.use(cors());  //파일다운로드시 파일명을 전달하려면 Content-Disposition설정이 필요함
 app.use(cors({
-    origin: 'http://localhost:5173',
+    origin: process.env.VITE_FRONT_URL,
     credentials: true,
     exposedHeaders: ['Content-Disposition']
   }))
