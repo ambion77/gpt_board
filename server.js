@@ -1,3 +1,4 @@
+import dotenv from "dotenv";
 import express from "express";
 import fs from "fs";
 import cors from "cors";
@@ -7,10 +8,15 @@ import authRoutes from "./routes/authRoutes.js";
 import menuRoutes from "./routes/menuRoutes.js";
 import imageRoutes from "./routes/imageRoutes.js";
 import boardRoutes from "./routes/boardRoutes.js";
-import "dotenv/config";
+//import "dotenv/config";
 import jwt from "jsonwebtoken";
 import winston from "winston";
-import dotenv from "dotenv";
+
+if (process.env.NODE_ENV === 'prd') {
+    dotenv.config({ path: ".prd.env" });
+  } else {
+    dotenv.config({ path: ".dev.env" });
+  }
 
 const logger = winston.createLogger({
     level: 'info',
@@ -26,11 +32,7 @@ const logger = winston.createLogger({
 
 //dotenv.config(); // .env 파일 로드
 // NODE_ENV에 따라 다른 .env 파일을 로드
-if (process.env.NODE_ENV === 'prd') {
-  dotenv.config({ path: '.prd.env' });
-} else {
-  dotenv.config({ path: '.dev.env' });
-}
+
 
 const app = express();
 const PORT = 3000;
@@ -316,5 +318,5 @@ function verifyToken(req, res, next) {
 }
 
 app.listen(PORT, () => {
-    console.log(`🚀 서버 실행 중: http://localhost:${PORT}`);
+    console.log(`🚀 서버 실행 중: ${process.env.VITE_API_URL}`);
 });

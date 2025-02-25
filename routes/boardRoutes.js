@@ -70,7 +70,6 @@ router.get("/getBoardInfo/:id", async (req, res) => {
   try {
     const id = req.params.id;
     const [results] = await db.query(queries.getBoardInfo, [id]); // ✅ 올바른 위치
-    console.log('getBoardInfo:', results);
     res.json(results);
   } catch (err) {
     res.status(500).json({ message: "DB 조회 실패", error: err });
