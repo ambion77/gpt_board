@@ -13,9 +13,9 @@ import jwt from "jsonwebtoken";
 import winston from "winston";
 
 if (process.env.NODE_ENV === 'prd') {
-    dotenv.config({ path: ".prd.env" });
+    dotenv.config({ path: ".env.prd" });
   } else {
-    dotenv.config({ path: ".dev.env" });
+    dotenv.config({ path: ".env.dev" });
   }
 
 const logger = winston.createLogger({
