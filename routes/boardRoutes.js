@@ -135,7 +135,7 @@ router.post('/create', upload.single('file'), async (req, res) => {
 // 게시물 삭제 API
 router.post("/deleteBoards", async (req, res) => {
   try {
-    const { boardIds, page = 1, limit = 5 } = req.body;  // page와 limit 값도 받음
+    const { boardIds, page = 1, limit = 10 } = req.body;  // page와 limit 값도 받음
     console.log('boardIds:', boardIds);
 
     if (!boardIds || boardIds.length == 0) {
@@ -171,10 +171,13 @@ router.post("/deleteBoards", async (req, res) => {
   }
 });
 
-// 게시물 수정 API
-router.post("/updateBoard", async (req, res) => {
+// 수정 API에 Multer 미들웨어 추가
+router.post("/updateBoard", upload.single('file'), async (req, res) => { // 추가
   try {
-      const { id, title, content } = req.body;
+      console.log('req.body:', req.body);
+      const { title, content, id } = req.body;
+      
+      // 필수 필드 검증
       if (!id || !title || !content) {
           return res.status(400).json({ message: "필수 항목이 누락되었습니다." });
       }
@@ -192,24 +195,50 @@ router.post("/updateBoard", async (req, res) => {
   }
 });
 
-// 답변 추가 API
-router.post("/addReply", async (req, res) => {
+// 수정된 답변 추가 API (파일 업로드 처리 추가)
+router.post("/addReply", upload.single('file'), async (req, res) => {
+  const connection = await db.getConnection();
   try {
+      await connection.beginTransaction();
+
+      // 1. 답변 게시물 정보 저장
       const { title, content, parent_id } = req.body;
-      if (!title || !content || !parent_id) {
-          return res.status(400).json({ message: "필수 항목이 누락되었습니다." });
+      const [replyResult] = await connection.execute(queries.insertReply, [
+          title,
+          content,
+          parent_id,
+          "작성자", // 실제로는 세션 등에서 가져와야 함
+          req.body.depth || 1 // depth 기본값 설정
+      ]);
+
+      console.log('replyResult:', replyResult);
+
+      // 2. 파일 정보 저장 (파일이 첨부된 경우)
+      if (req.file) {
+          await connection.execute(queries.insertBoardFile, [
+              replyResult.insertId, // 방금 생성된 답변의 ID
+              req.file.originalname,
+              req.file.mimetype,
+              req.file.path,
+              req.file.size
+          ]);
       }
 
-      const [result] = await db.query(queries.insertReply, [title, content, parent_id, "작성자"]);
+      await connection.commit();
+      res.json({ success: true, message: "답변 및 파일이 등록되었습니다." });
 
-      if (result.affectedRows === 0) {
-          return res.status(500).json({ message: "답변 등록 실패" });
-      }
-
-      res.json({ success: true, message: "답변이 등록되었습니다." });
   } catch (error) {
+      await connection.rollback();
+      
+      // 업로드된 파일 삭제
+      if (req.file && fs.existsSync(req.file.path)) {
+          fs.unlinkSync(req.file.path);
+      }
+
       console.error("답변 등록 오류:", error);
       res.status(500).json({ message: "서버 오류 발생", error });
+  } finally {
+      connection.release();
   }
 });
 
@@ -247,5 +276,17 @@ router.get('/download/:fileId', async (req, res) => {
       res.status(500).json({ error: '서버 오류 발생' });
     }
   });
+
+  router.post("/increaseView/:id", async (req, res) => {
+    const boardId = req.params.id;
+    try {
+        await db.query(queries.updateBoardView, [boardId]);
+        res.status(200).json({ message: "조회수 증가 성공" });
+    } catch (error) {
+        console.error("조회수 증가 실패:", error);
+        res.status(500).json({ error: "조회수 증가 실패" });
+    }
+  });
+
 
 export default router;

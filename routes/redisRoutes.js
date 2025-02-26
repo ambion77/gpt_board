@@ -2,6 +2,7 @@ import express from "express";
 import cors from "cors";
 import { createClient } from "redis"; // ✅ 4.x+ 버전 임포트
 import dotenv from "dotenv";
+import winston from "winston";
 
 const router = express.Router();
 router.use(cors());

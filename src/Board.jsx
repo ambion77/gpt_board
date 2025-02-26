@@ -180,12 +180,14 @@ function Board() {
     };
 
     return (
-        <div className="board-container">
-            <h1>REACT 게시판</h1>
-            <h3>*xml파일로 게시판내용 저장</h3>
-            <div className="board-buttons">
-                <button onClick={() => setIsCreatePopupOpen(true)} style={{ marginTop: '10px' }}>새글</button>
-                <button onClick={deleteSelectedPosts} style={{ marginTop: '10px' }}>삭제</button>
+        <div>
+            <h1>질의응답 게시판</h1>
+            <div className="board-upload">
+                <div><h3>*xml파일로 게시판내용 저장</h3></div>
+                <div className="marginLeft">
+                    <button onClick={() => setIsCreatePopupOpen(true)} >새글</button>&nbsp;
+                    <button onClick={deleteSelectedPosts} >삭제</button>
+                </div>
             </div>
             <table id="postTable">
                 <thead>

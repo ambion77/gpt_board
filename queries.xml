@@ -58,7 +58,7 @@
 
     <query id="getBoardListWithPaginationCount">SELECT count(*) as totalCount FROM board;</query>
     <query id="getBoardListWithPagination">
-        SELECT b.id, b.title, b.content, b.author, b.views, DATE_FORMAT(b.created_date, "%Y/%m/%d %T") as created_date
+        SELECT b.id, b.title, b.content, b.author, b.views, b.parent_id, b.depth, DATE_FORMAT(b.created_date, "%Y/%m/%d %T") as created_date
         FROM board b
         order by b.created_date desc LIMIT ? OFFSET ? ;
     </query>
@@ -82,12 +82,12 @@
     <query id="deleteBoardsFile">DELETE FROM board_file WHERE board_id IN (?);</query>
     <query id="insertReply">
         INSERT INTO board
-        (title, content, parent_id,author)
+        (title, content, parent_id,author,depth)
         VALUES
-        (?, ?, ?, ?);
+        (?, ?, ?, ?, ?);
     </query>
     <query id="updateBoard">UPDATE board SET title = ?, content = ? WHERE id = ?;</query>
-
+    <query id="updateBoardView">UPDATE board SET views = views + 1 WHERE id = ?;</query>
     
     
 </queries>

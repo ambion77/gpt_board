@@ -1,21 +1,31 @@
 import React, { useState, useEffect } from 'react';
 
-const BoardUpload = ({ onUploadSuccess, onClose, title = "", content = "", parentId = null, depth = 0 }) => {
+const BoardUpload = ({ id=null,onUploadSuccess, onClose, title = "", content = "", parentId = null, depth = 0 }) => {
     const [inputTitle, setInputTitle] = useState(title);
+    const [inputDepth, setDepth] = useState(depth);
     const [inputContent, setInputContent] = useState(content);
     const [file, setFile] = useState(null);
     const apiUrl = import.meta.env.VITE_API_URL;
 
+    // 추가: props가 변경될 때 상태 업데이트
+    useEffect(() => {
+        setInputTitle(title);
+        setInputContent(content);
+        setDepth(depth);
+    }, [title, content, depth, parentId]); // 관련 props 변경 시 실행
+
     useEffect(() => {
         if (parentId) {
-            setInputTitle(`RE: ${title}`); // 답변 시 제목 자동 입력
+            setInputTitle(title && title.trim() !== "" ? `RE: ${title}` : "RE: (제목 없음)");
+            setInputContent(content);
+            setDepth(depth || 1); // depth가 없으면 기본값 1
         }
-    }, [parentId, title]);
+    }, [parentId, title, depth]);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
 
-        if (!inputTitle || !inputContent) {
+        if (!inputTitle.trim() || !inputContent.trim()) {
             alert('제목과 내용은 필수 입력 항목입니다.');
             return;
         }
@@ -23,14 +33,26 @@ const BoardUpload = ({ onUploadSuccess, onClose, title = "", content = "", paren
         const formData = new FormData();
         formData.append('title', inputTitle);
         formData.append('content', inputContent);
-        formData.append('depth', depth); // depth 추가
-        if (file) formData.append('file', file);
+        formData.append('depth', inputDepth || 0); // depth가 undefined면 기본값 0
 
-        let apiEndpoint = parentId ? `${apiUrl}/api/board/addReply` : `${apiUrl}/api/board/create`;
-        if (parentId) {
-            formData.append('parent_id', parentId);
+        if (file) formData.append('file', file);
+        if (parentId) formData.append('parent_id', parentId);
+        if (id) formData.append('id', id);
+
+        console.log('id:', id);
+        
+        // API 엔드포인트 설정
+        let apiEndpoint;
+        if (id) {
+            apiEndpoint = `${apiUrl}/api/board/updateBoard`;
+        } else if (parentId) {
+            apiEndpoint = `${apiUrl}/api/board/addReply`;
+        } else {
+            apiEndpoint = `${apiUrl}/api/board/create`;
         }
 
+        console.log('apiEndpoint:', apiEndpoint);
+        
         try {
             const response = await fetch(apiEndpoint, {
                 method: 'POST',
@@ -42,7 +64,7 @@ const BoardUpload = ({ onUploadSuccess, onClose, title = "", content = "", paren
                 throw new Error(errorData.message || '업로드 실패');
             }
 
-            alert(parentId ? '답변이 성공적으로 등록되었습니다' : '게시물이 성공적으로 등록되었습니다');
+            alert(id ? '게시물이 수정되었습니다.' : (parentId ? '답글이 등록되었습니다.' : '게시물이 등록되었습니다.'));
             setInputTitle('');
             setInputContent('');
             setFile(null);
@@ -57,7 +79,7 @@ const BoardUpload = ({ onUploadSuccess, onClose, title = "", content = "", paren
         <div className="board-popup">
             <div className="board-popup-content">
                 <span className="close-btn" onClick={onClose}>✖</span>
-                <h3>{parentId ? "✍ 답변 작성" : "📤 새 게시물 작성"}</h3>
+                <h3>{parentId ? "✍ 답글 작성" : "📤 새 게시물 작성"}</h3>
                 <form onSubmit={handleSubmit}>
                     <div className="form-group">
                         <label>제목</label>
@@ -67,7 +89,7 @@ const BoardUpload = ({ onUploadSuccess, onClose, title = "", content = "", paren
                             value={inputTitle}
                             onChange={(e) => setInputTitle(e.target.value)}
                             required
-                            readOnly={!!parentId} // 답변 작성 시 제목 고정
+                            //readOnly={!!parentId} // 답글 작성 시 제목 고정
                         />
                     </div>
                     
@@ -89,8 +111,9 @@ const BoardUpload = ({ onUploadSuccess, onClose, title = "", content = "", paren
                             onChange={(e) => setFile(e.target.files[0])}
                         />
                     </div>
-
-                    <button type="submit">{parentId ? "답변 등록" : "업로드"}</button>
+                    <div className='align-right'>
+                        <button type="submit" >{parentId ? "답글 등록" : "저장"}</button>
+                    </div>
                 </form>
             </div>
         </div>

@@ -9,7 +9,7 @@ if (process.env.NODE_ENV === 'prd') {
 }else if (process.env.NODE_ENV === 'dev') {
     dotenv.config({ path: '.env.dev' });     
 } else {
-  dotenv.config({ path: '.env.loc' });d
+  dotenv.config({ path: '.env.loc' });
 }
 
 const pool = mysql.createPool({

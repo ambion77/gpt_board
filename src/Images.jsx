@@ -63,7 +63,7 @@ function ImageList() {
         try {
             // 현재 페이지와 limit을 가져옵니다.
             const page = currentPage; // 현재 페이지
-            const limit = 5;  // 한 페이지에 보여줄 이미지 수
+            const limit = 10;  // 한 페이지에 보여줄 이미지 수
             const response = await fetch(`${apiUrl}/api/image/deleteImages`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },

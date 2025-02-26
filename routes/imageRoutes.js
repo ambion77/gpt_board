@@ -33,7 +33,7 @@ let queries = {};
 router.get("/getImageList", async (req, res) => {
   try {
     const page = parseInt(req.query.page) || 1;  // 페이지 번호 (기본값: 1)
-    const limit = 10;  // 한 페이지에 표시할 이미지 수
+    const limit = 5;  // 한 페이지에 표시할 이미지 수
     const offset = (page - 1) * limit;
 
     // 이미지 목록 조회 쿼리

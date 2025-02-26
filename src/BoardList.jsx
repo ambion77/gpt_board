@@ -6,7 +6,7 @@ function BoardList() {
     const [selectedBoards, setSelectedBoards] = useState([]);
     const [selectedBoard, setSelectedBoard] = useState(null);
     const [editingBoard, setEditingBoard] = useState(null);     // 수정 상태
-    const [replyingBoard, setReplyingBoard] = useState(null);   // 답변 상태
+    const [replyingBoard, setReplyingBoard] = useState(null);   // 답글 상태
     const [currentPage, setCurrentPage] = useState(1);  // 현재 페이지
     const [pageSize, setPageSize] = useState(5);  // 한 페이지에 보여줄 게시물 수
     //const [totalBoards, setTotalBoards] = useState(0);  // 총 게시물 수
@@ -27,7 +27,11 @@ function BoardList() {
         try {
             const response = await fetch(`${apiUrl}/api/board/getBoardList?page=${page}&limit=${pageSize}`);
             const data = await response.json();
-            setBoards(data.boards);
+            //setBoards(data.boards);
+
+            if (data.boards) {
+                setBoards(organizeBoards(data.boards)); // 정렬된 목록 저장
+            }
             
             if (data.pagination && data.pagination.totalPages) {
                 setPagination(data.pagination);  // pagination 정보가 유효한 경우에만 설정
@@ -37,6 +41,44 @@ function BoardList() {
         } catch (error) {
           console.error("Error fetching boards:", error);
         }
+    };
+
+    // 원글을 최신순으로 정렬하면서 답글 글을 원글 아래에 정렬
+    const organizeBoards = (boards) => {
+        const boardMap = new Map();
+        
+        // 모든 게시물을 ID 기반으로 저장
+        boards.forEach((board) => {
+            boardMap.set(board.id, { ...board, children: [] });
+        });
+
+        const rootBoards = [];
+
+        // 부모-자식 관계를 구성
+        boards.forEach((board) => {
+            if (board.parent_id) {
+                // 부모 글이 존재하면 부모 글의 children 배열에 추가
+                if (boardMap.has(board.parent_id)) {
+                    boardMap.get(board.parent_id).children.push(boardMap.get(board.id));
+                }
+            } else {
+                // 원글이면 rootBoards에 추가
+                rootBoards.push(boardMap.get(board.id));
+            }
+        });
+
+        // 최신 원글 순으로 정렬, 각 원글의 답글들도 정렬
+        const sortedBoards = rootBoards.sort((a, b) => new Date(b.created_date) - new Date(a.created_date));
+
+        // 트리 구조를 펼쳐서 리스트로 변환
+        const flattenTree = (boardList, depth = 0) => {
+            return boardList.flatMap((board) => [
+                { ...board, depth },
+                ...flattenTree(board.children.sort((a, b) => new Date(a.created_date) - new Date(b.created_date)), depth + 1)
+            ]);
+        };
+
+        return flattenTree(sortedBoards);
     };
 
     useEffect(() => {
@@ -66,7 +108,7 @@ function BoardList() {
         try {
             // 현재 페이지와 limit을 가져옵니다.
             const page = currentPage; // 현재 페이지
-            const limit = 5;  // 한 페이지에 보여줄 게시물 수
+            const limit = 10;  // 한 페이지에 보여줄 게시물 수
             const response = await fetch(`${apiUrl}/api/board/deleteBoards`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
@@ -85,18 +127,25 @@ function BoardList() {
         }
     };
 
-    const openPopup = (id) => {
-        fetch(`${apiUrl}/api/board/getBoardInfo/${id}`)
-            .then((response) => response.json())
-            .then((data) => {
-                console.log("서버 응답 데이터:", data[0]); // 🔍 데이터 구조 확인
-                setSelectedBoard(data[0]);
-            })
-            .catch((error) => console.error("Error fetching board:", error));
+    const openPopup = async (id) => {
+        try{
+            // 조회수 증가 API 호출
+            await fetch(`${apiUrl}/api/board/increaseView/${id}`, { method: "POST" });
+
+            // 상세 정보 가져오기
+            const response = await fetch(`${apiUrl}/api/board/getBoardInfo/${id}`);
+            const data = await response.json();
+
+            console.log("서버 응답 데이터:", data[0]); // 🔍 데이터 구조 확인
+            setSelectedBoard(data[0]); // 상세 정보 업데이트
+        } catch (error) {
+            console.error("Error fetching board:", error);
+        }   
     };
 
     const closePopup = () => {
         setSelectedBoard(null);
+        refreshBoards(currentPage); // 상세 창 닫히면 목록 갱신
     };
 
     // 파일 다운로드 핸들러
@@ -149,8 +198,11 @@ function BoardList() {
         refreshBoards(newPage);   // 페이지 변경 시 게시물 갱신
     };
 
-    // 게시물 수정 관련 상태
-    const handleEdit = () => setEditingBoard(selectedBoard);
+    // 수정 핸들러 수정
+    const handleEdit = () => {
+        if (!selectedBoard) return;
+        setEditingBoard(selectedBoard);
+    };
     const handleEditSubmit = async () => {
         await fetch(`${apiUrl}/api/board/updateBoard`, {
             method: "POST",
@@ -161,13 +213,14 @@ function BoardList() {
         refreshBoards(currentPage);
     };
 
-    // 답변 관련 상태
+    // 답글 핸들러 수정
     const handleReply = () => {
+        if (!selectedBoard) return;
         setReplyingBoard({
-            title: "",
+            title: selectedBoard.title || "(제목 없음)", // 제목이 없을 경우 기본값
             content: "",
             parent_id: selectedBoard.id,
-            depth: selectedBoard.depth + 1, // 부모의 depth + 1
+            depth: (selectedBoard.depth || 0) + 1 // depth 안전 처리
         });
     };
     
@@ -175,7 +228,7 @@ function BoardList() {
         await fetch(`${apiUrl}/api/board/addReply`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ title: replyingBoard.title, content: replyingBoard.content, parent_id: replyingBoard.parent_id }),
+            body: JSON.stringify({ title: replyingBoard.title, content: replyingBoard.content, parent_id: replyingBoard.parent_id ,depth:replyingBoard.depth}),
         });
         setReplyingBoard(null);
         refreshBoards(currentPage);
@@ -183,9 +236,9 @@ function BoardList() {
 
     return (
         <div>
-            <h1>📋 게시물 목록</h1>
+            <h1>📋 첨부파일 게시판</h1>
             <div className="board-upload">
-                <div><h3>DB 데이터를 게시물로 불러옴</h3></div>
+                <div><h3>*DB 데이터를 게시물로 불러옴</h3></div>
                 <div className="marginLeft">
                   <button onClick={() => setShowUpload(true)}>추가</button>&nbsp;
                   <button onClick={handleDelete}>삭제</button>
@@ -221,7 +274,12 @@ function BoardList() {
                                 />
                             </td>
                             <td>{img.id}</td>
-                            <td><a href="#" className="post-title" onClick={() => openPopup(img.id)}>{img.title}</a></td>
+                            <td><a 
+                                    href="#" 
+                                    className="post-title" 
+                                    onClick={() => openPopup(img.id)}
+                                    style={{ marginLeft: `${img.depth * 20}px` }} // 들여쓰기 적용
+                                >{img.title}</a></td>
                             <td>
                                 {img.author}
                             </td>
@@ -263,33 +321,39 @@ function BoardList() {
                         <div><span className="close-btn" onClick={closePopup}>✖</span></div>
                         <h2>{selectedBoard.title}</h2>
                         <p>{selectedBoard.content}</p>
-                        <button onClick={handleEdit}>수정</button>
-                        <button onClick={handleReply}>답변</button>
                         {/* selectedBoard.file_id가 있을 때만 버튼을 보여줌 */}
                         {selectedBoard.file_id && (                      
                         <div><button className="download-btn" onClick={() => handleDownload(selectedBoard.id)}>📥 다운로드</button></div>
                         )}
+                        <div className="align-right">
+                            <button onClick={handleEdit}>수정</button>&nbsp;
+                            <button onClick={handleReply}>답글</button>
+                        </div>
                     </div>
                 </div>
             )}
             {editingBoard && (
                 <BoardUpload
+                    id={editingBoard.id}  // 수정 모드 여부 확인용
                     title={editingBoard.title}
                     content={editingBoard.content}
                     onClose={() => setEditingBoard(null)}
                     onUploadSuccess={() => {
                         setEditingBoard(null);
                         refreshBoards(currentPage);
+                        setSelectedBoard(null); // 상세 보기 팝업도 닫기
                     }}
                 />
             )}
             {replyingBoard && (
                 <BoardUpload
                     parentId={replyingBoard.parent_id}
+                    depth={replyingBoard.depth}
                     onClose={() => setReplyingBoard(null)}
                     onUploadSuccess={() => {
                         setReplyingBoard(null);
                         refreshBoards(currentPage);
+                        setSelectedBoard(null); // 상세 보기 팝업도 닫기
                     }}
                 />
             )}
