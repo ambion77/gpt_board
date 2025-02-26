@@ -8,15 +8,18 @@ import authRoutes from "./routes/authRoutes.js";
 import menuRoutes from "./routes/menuRoutes.js";
 import imageRoutes from "./routes/imageRoutes.js";
 import boardRoutes from "./routes/boardRoutes.js";
+import redisRoutes from "./routes/redisRoutes.js";
 //import "dotenv/config";
 import jwt from "jsonwebtoken";
 import winston from "winston";
 
 if (process.env.NODE_ENV === 'prd') {
     dotenv.config({ path: ".env.prd" });
-  } else {
-    dotenv.config({ path: ".env.dev" });
-  }
+}else if (process.env.NODE_ENV === 'dev') {
+    dotenv.config({ path: ".env.dev" });    
+} else {
+    dotenv.config({ path: ".env.loc" });
+}
 
 const logger = winston.createLogger({
     level: 'info',
@@ -52,6 +55,7 @@ app.use("/api/auth", authRoutes); // 로그인 API 추가
 app.use("/api/menu", menuRoutes); // menu API 추가
 app.use("/api/image", imageRoutes); // 이미지 API 추가
 app.use("/api/board", boardRoutes); // 게시판 API 추가
+app.use("/api/redis", redisRoutes); // radis API 추가
 
 const xmlFilePath = "board.xml";    // 📌 XML 파일 경로
 const POSTS_PER_PAGE = 10;  // 📌 한 페이지당 게시글 수

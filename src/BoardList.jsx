@@ -5,6 +5,8 @@ function BoardList() {
     const [boards, setBoards] = useState([]);
     const [selectedBoards, setSelectedBoards] = useState([]);
     const [selectedBoard, setSelectedBoard] = useState(null);
+    const [editingBoard, setEditingBoard] = useState(null);     // 수정 상태
+    const [replyingBoard, setReplyingBoard] = useState(null);   // 답변 상태
     const [currentPage, setCurrentPage] = useState(1);  // 현재 페이지
     const [pageSize, setPageSize] = useState(5);  // 한 페이지에 보여줄 게시물 수
     //const [totalBoards, setTotalBoards] = useState(0);  // 총 게시물 수
@@ -147,6 +149,38 @@ function BoardList() {
         refreshBoards(newPage);   // 페이지 변경 시 게시물 갱신
     };
 
+    // 게시물 수정 관련 상태
+    const handleEdit = () => setEditingBoard(selectedBoard);
+    const handleEditSubmit = async () => {
+        await fetch(`${apiUrl}/api/board/updateBoard`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ id: editingBoard.id, title: editingBoard.title, content: editingBoard.content }),
+        });
+        setEditingBoard(null);
+        refreshBoards(currentPage);
+    };
+
+    // 답변 관련 상태
+    const handleReply = () => {
+        setReplyingBoard({
+            title: "",
+            content: "",
+            parent_id: selectedBoard.id,
+            depth: selectedBoard.depth + 1, // 부모의 depth + 1
+        });
+    };
+    
+    const handleReplySubmit = async () => {
+        await fetch(`${apiUrl}/api/board/addReply`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ title: replyingBoard.title, content: replyingBoard.content, parent_id: replyingBoard.parent_id }),
+        });
+        setReplyingBoard(null);
+        refreshBoards(currentPage);
+    };
+
     return (
         <div>
             <h1>📋 게시물 목록</h1>
@@ -227,14 +261,37 @@ function BoardList() {
                 <div className="board-popup">
                     <div className="board-popup-content">
                         <div><span className="close-btn" onClick={closePopup}>✖</span></div>
-                        <div className="board_title"><span>제목: </span><span>{selectedBoard.title}</span></div>
-                        <div className="board_content"><span>내용:</span><span>{selectedBoard.content}</span></div> 
+                        <h2>{selectedBoard.title}</h2>
+                        <p>{selectedBoard.content}</p>
+                        <button onClick={handleEdit}>수정</button>
+                        <button onClick={handleReply}>답변</button>
                         {/* selectedBoard.file_id가 있을 때만 버튼을 보여줌 */}
                         {selectedBoard.file_id && (                      
                         <div><button className="download-btn" onClick={() => handleDownload(selectedBoard.id)}>📥 다운로드</button></div>
                         )}
                     </div>
                 </div>
+            )}
+            {editingBoard && (
+                <BoardUpload
+                    title={editingBoard.title}
+                    content={editingBoard.content}
+                    onClose={() => setEditingBoard(null)}
+                    onUploadSuccess={() => {
+                        setEditingBoard(null);
+                        refreshBoards(currentPage);
+                    }}
+                />
+            )}
+            {replyingBoard && (
+                <BoardUpload
+                    parentId={replyingBoard.parent_id}
+                    onClose={() => setReplyingBoard(null)}
+                    onUploadSuccess={() => {
+                        setReplyingBoard(null);
+                        refreshBoards(currentPage);
+                    }}
+                />
             )}
         </div>
     );

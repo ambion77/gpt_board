@@ -63,7 +63,7 @@
         order by b.created_date desc LIMIT ? OFFSET ? ;
     </query>
     <query id="getBoardInfo">
-        SELECT b.id, b.title, b.content, b.author , bf.id as file_id ,bf.file_path, bf.file_type, bf.file_name
+        SELECT b.id, b.title, b.content, b.author, b.parent_id, b.depth, bf.id as file_id ,bf.file_path, bf.file_type, bf.file_name
         FROM board b left outer JOIN  board_file bf ON b.id = bf.board_id 
         WHERE b.id = ?;</query>
     <query id="insertBoard">
@@ -80,4 +80,14 @@
     </query>
     <query id="deleteBoards">DELETE FROM board WHERE id IN (?);</query>
     <query id="deleteBoardsFile">DELETE FROM board_file WHERE board_id IN (?);</query>
+    <query id="insertReply">
+        INSERT INTO board
+        (title, content, parent_id,author)
+        VALUES
+        (?, ?, ?, ?);
+    </query>
+    <query id="updateBoard">UPDATE board SET title = ?, content = ? WHERE id = ?;</query>
+
+    
+    
 </queries>

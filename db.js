@@ -6,8 +6,10 @@ import dotenv from "dotenv";
 // NODE_ENV에 따라 다른 .env 파일을 로드
 if (process.env.NODE_ENV === 'prd') {
   dotenv.config({ path: ".env.prd" });
+}else if (process.env.NODE_ENV === 'dev') {
+    dotenv.config({ path: ".env.dev" });     
 } else {
-  dotenv.config({ path: ".env.dev" });
+  dotenv.config({ path: ".env.loc" });
 }
 
 const pool = mysql.createPool({

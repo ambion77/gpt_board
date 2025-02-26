@@ -171,6 +171,49 @@ router.post("/deleteBoards", async (req, res) => {
   }
 });
 
+// 게시물 수정 API
+router.post("/updateBoard", async (req, res) => {
+  try {
+      const { id, title, content } = req.body;
+      if (!id || !title || !content) {
+          return res.status(400).json({ message: "필수 항목이 누락되었습니다." });
+      }
+
+      const [result] = await db.query(queries.updateBoard, [title, content, id]);
+
+      if (result.affectedRows === 0) {
+          return res.status(404).json({ message: "수정할 게시물을 찾을 수 없습니다." });
+      }
+
+      res.json({ success: true, message: "게시물이 수정되었습니다." });
+  } catch (error) {
+      console.error("게시물 수정 오류:", error);
+      res.status(500).json({ message: "서버 오류 발생", error });
+  }
+});
+
+// 답변 추가 API
+router.post("/addReply", async (req, res) => {
+  try {
+      const { title, content, parent_id } = req.body;
+      if (!title || !content || !parent_id) {
+          return res.status(400).json({ message: "필수 항목이 누락되었습니다." });
+      }
+
+      const [result] = await db.query(queries.insertReply, [title, content, parent_id, "작성자"]);
+
+      if (result.affectedRows === 0) {
+          return res.status(500).json({ message: "답변 등록 실패" });
+      }
+
+      res.json({ success: true, message: "답변이 등록되었습니다." });
+  } catch (error) {
+      console.error("답변 등록 오류:", error);
+      res.status(500).json({ message: "서버 오류 발생", error });
+  }
+});
+
+
 // 파일 다운로드 API
 router.get('/download/:fileId', async (req, res) => {
     try {

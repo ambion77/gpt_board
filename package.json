@@ -4,6 +4,7 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
+    "loc": "concurrently \"vite --host --mode loc\" \"cross-env NODE_ENV=loc node server.js\"",
     "dev": "concurrently \"vite --host --mode dev\" \"cross-env NODE_ENV=dev node server.js\"",
     "prd": "concurrently \"vite --host --mode prd\" \"cross-env NODE_ENV=prd node server.js\"",
     "//": "//는 주석이란 뜻. 실행시 concurrently는 vite 서버와 node 서버를 동시에 실행한다는 뜻.vite는 5173포트, node는 3000포트로 실행. cross-env 는 개발과 운영 환경설정 구분용.",
@@ -14,10 +15,12 @@
   "dependencies": {
     "axios": "^1.7.9",
     "bcrypt": "^5.1.1",
+    "connect-redis": "^8.0.1",
     "cors": "^2.8.5",
     "cross-env": "^7.0.3",
     "dotenv": "^16.4.7",
     "express": "^4.21.2",
+    "express-session": "^1.18.1",
     "express-winston": "^4.2.0",
     "fast-xml-parser": "^4.5.1",
     "jsonwebtoken": "^9.0.2",
@@ -25,6 +28,7 @@
     "mysql2": "^3.12.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
+    "redis": "^4.7.0",
     "sharp": "^0.33.5",
     "winston": "^3.17.0",
     "xml2js": "^0.6.2"
@@ -40,6 +44,7 @@
     "eslint-plugin-react-hooks": "^5.0.0",
     "eslint-plugin-react-refresh": "^0.4.18",
     "globals": "^15.14.0",
+    "nodemon": "^3.1.9",
     "vite": "^6.1.0"
   },
   "description": "This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.",
