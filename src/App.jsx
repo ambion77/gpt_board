@@ -85,12 +85,39 @@ const App = () => {
     const [content, setContent] = useState(null);
     const [navigator, setNavigator] = useState("홈");
 
+    // 토큰 확인
+    const jwtToken = localStorage.getItem("jwt");
+    console.log("토큰:", jwtToken);
+    let tokenParts=null;
+    let payload=null;
+    if (jwtToken !=null) {
+        // 토큰 분해
+        tokenParts = jwtToken.split('.');
+        // 페이로드 추출 (Base64 디코딩)
+        payload = JSON.parse(atob(tokenParts[1]));        
+        console.log("사용자 정보:", payload);
+    }
+    
+    const userLogOut = () => {
+        localStorage.removeItem("jwt");
+        setTimeout(() => window.location.href = "/login.html", 1000); 
+    };
+
     return (
         <div className="app-container">
             <header className="header">
                 <div className="logo">MyApp</div>
                 <nav className="nav">경로: {navigator}</nav>
-                <button onClick={userLogOut} className="logout-button">로그아웃</button>
+                {payload ? (
+                    <div className="logo">
+                        <span>{payload.userid} 님 안녕하세요</span>
+                        <button onClick={userLogOut} className="logout-button">로그아웃</button>
+                    </div>
+                ):(
+                    <div className="logo">
+                        <button onClick={userLogOut} className="logout-button">로그인</button>
+                    </div>
+                )}
             </header>
             <div className="main-container">
                 <div className="left-panel">
@@ -104,9 +131,6 @@ const App = () => {
     );
 };
 
-const userLogOut = () => {
-    localStorage.removeItem("jwt");
-    setTimeout(() => window.location.href = "/login.html", 1000); 
-};
+
 
 export default App;
