@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import './Board.css';
+import '../css/Board.css';
 
 function Board() {
     const [posts, setPosts] = useState([]);
