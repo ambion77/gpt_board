@@ -14,11 +14,11 @@ import jwt from "jsonwebtoken";
 import winston from "winston";
 
 if (process.env.NODE_ENV === 'prd') {
-    dotenv.config({ path: ".env.prd" });
+    dotenv.config({ path: '.env.prd' });
 }else if (process.env.NODE_ENV === 'dev') {
-    dotenv.config({ path: ".env.dev" });    
+    dotenv.config({ path: '.env.dev' });    
 } else {
-    dotenv.config({ path: ".env.loc" });
+    dotenv.config({ path: '.env.loc' });
 }
 
 const logger = winston.createLogger({
@@ -315,12 +315,12 @@ function verifyToken(req, res, next) {
             return res.status(401).json({ message: "유효하지 않은 토큰입니다." });
         }
         req.user = decoded; // 디코딩된 사용자 정보 저장
-        console.log('server.js req.user.id:::'+req.user.id);
-        console.log('server.js req.user.email:::'+req.user.email);
+        logger.info('server.js req.user.id:::'+req.user.id);
+        logger.info('server.js req.user.email:::'+req.user.email);
         next();
     });
 }
 
 app.listen(PORT, () => {
-    console.log(`🚀 서버 실행 중: ${process.env.VITE_API_URL}`);
+    logger.info(`🚀 서버 실행 중: ${process.env.VITE_API_URL}`);
 });
