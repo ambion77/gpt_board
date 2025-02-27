@@ -20,7 +20,7 @@ function Board() {
     }, [currentPage]);
 
     const loadPosts = (page) => {
-        fetch(`${apiUrl}/posts?page=${page}`)
+        fetch(`${apiUrl}/api/xml/posts?page=${page}`)
             .then(response => response.json())
             .then(data => {
                 setPosts(data.posts);
@@ -39,7 +39,7 @@ function Board() {
     };
 
     const openPopup = (postId) => {
-        fetch(`${apiUrl}/post/${postId}`)
+        fetch(`${apiUrl}/api/xml/post/${postId}`)
             .then(response => response.json())
             .then(post => {
                 setPopupData(post);
@@ -75,7 +75,7 @@ function Board() {
             return;
         }
 
-        fetch(`${apiUrl}/createPosts`, {
+        fetch(`${apiUrl}/api/xml/createPosts`, {
             method: "POST",
             headers: { "Content-Type": "application/json", "Authorization": `Bearer ${localStorage.getItem("jwt")}` },
             body: JSON.stringify(newPost),
@@ -90,7 +90,7 @@ function Board() {
     const updatePost = () => {
         const updatedPost = { ...popupData, title: document.getElementById('editTitle').value, content: document.getElementById('editContent').value };
 
-        fetch(`${apiUrl}/updatePosts`, {
+        fetch(`${apiUrl}/api/xml/updatePosts`, {
             method: "POST",
             headers: { "Content-Type": "application/json", "Authorization": `Bearer ${localStorage.getItem("jwt")}` },
             body: JSON.stringify(updatedPost),
@@ -105,7 +105,7 @@ function Board() {
     const deletePost = () => {
         if (!confirm("정말 이 게시글을 삭제하시겠습니까?")) return;
 
-        fetch(`${apiUrl}/deletePost/${popupData.id}`, {
+        fetch(`${apiUrl}/api/xml/deletePost/${popupData.id}`, {
             method: "DELETE",
             headers: { "Content-Type": "application/json", "Authorization": `Bearer ${localStorage.getItem("jwt")}` },
         })
@@ -133,7 +133,7 @@ function Board() {
 
         const reply = { postId: popupData.id, content: replyContent };
 
-        fetch(`${apiUrl}/addReply`, {
+        fetch(`${apiUrl}/api/xml/addReply`, {
             method: "POST",
             headers: { "Content-Type": "application/json", "Authorization": `Bearer ${localStorage.getItem("jwt")}` },
             body: JSON.stringify(reply),
@@ -155,7 +155,7 @@ function Board() {
             return;
         }
 
-        fetch(`${apiUrl}/deletePosts`, {
+        fetch(`${apiUrl}/api/xml/deletePosts`, {
             method: "POST",
             headers: { "Content-Type": "application/json", "Authorization": `Bearer ${localStorage.getItem("jwt")}` },
             body: JSON.stringify({ ids: selectedIds }),

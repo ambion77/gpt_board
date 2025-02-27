@@ -5,17 +5,23 @@ import BoardList from "./BoardList";
 import User from "./User";
 import Images from "./Images";
 import Visitors from "./Visitors";
-//import "./Menu.css";
+import GptSummary from "./GptSummary";
+import WebCrawling from "./WebCrawling";
 
 const menuData = [
-    { "id": 1, "menuid": "M001", "menuname": "시스템관리", "depth": 0, "url": "" },
-    { "id": 2, "menuid": "M00101", "menuname": "메뉴관리", "depth": 2, "url": "menuTree" },
-    { "id": 3, "menuid": "M00102", "menuname": "사용자관리", "depth": 2, "url": "user" },
-    { "id": 4, "menuid": "M00103", "menuname": "이미지관리", "depth": 2, "url": "Images" },
-    { "id": 5, "menuid": "M00104", "menuname": "redis", "depth": 2, "url": "Visitors" },
-    { "id": 6, "menuid": "M002", "menuname": "게시판관리", "depth": 0, "url": "" },
-    { "id": 7, "menuid": "M00201", "menuname": "XML REACT 게시판", "depth": 1, "url": "board" },
-    { "id": 8, "menuid": "M00202", "menuname": "DB REACT 게시판", "depth": 1, "url": "BoardList" }
+    { "id": 10, "menuid": "M001", "menuname": "시스템관리", "depth": 0, "url": "" },
+    { "id": 11, "menuid": "M00101", "menuname": "메뉴관리", "depth": 1, "url": "menuTree" },
+    { "id": 12, "menuid": "M00102", "menuname": "사용자관리", "depth": 1, "url": "user" },
+
+    { "id": 20, "menuid": "M002", "menuname": "게시판관리", "depth": 0, "url": "" },
+    { "id": 21, "menuid": "M00201", "menuname": "XML 게시판", "depth": 1, "url": "board" },
+    { "id": 22, "menuid": "M00202", "menuname": "DB 게시판", "depth": 1, "url": "BoardList" },
+    { "id": 23, "menuid": "M00203", "menuname": "이미지 게시판", "depth": 1, "url": "Images" },
+
+    { "id": 30, "menuid": "M003", "menuname": "외부연동관리", "depth": 0, "url": "" },
+    { "id": 31, "menuid": "M00301", "menuname": "web clawling", "depth": 1, "url": "WebCrawling" },
+    { "id": 32, "menuid": "M00302", "menuname": "redis", "depth": 1, "url": "Visitors" },
+    { "id": 33, "menuid": "M00303", "menuname": "Gpt요약", "depth": 1, "url": "GptSummary" },
 ];
 
 const MenuItem = ({ item, onSelect, activeMenu, setActiveMenu, setNavigator }) => {
@@ -30,14 +36,18 @@ const MenuItem = ({ item, onSelect, activeMenu, setActiveMenu, setNavigator }) =
                     onSelect(<MenuTree />);
                 }else if (item.menuid === "M00102") {
                     onSelect(<User />);
-                }else if (item.menuid === "M00103") {
-                    onSelect(<Images />);
-                }else if (item.menuid === "M00104") {
-                    onSelect(<Visitors />);        
                 } else if (item.menuid === "M00201") {
                     onSelect(<Board />);
                 } else if (item.menuid === "M00202") {
                     onSelect(<BoardList />);
+                }else if (item.menuid === "M00203") {
+                    onSelect(<Images />);
+                } else if (item.menuid === "M00301") {
+                    onSelect(<WebCrawling />);    
+                } else if (item.menuid === "M00302") {
+                    onSelect(<Visitors />);        
+                }else if (item.menuid === "M00303") {
+                    onSelect(<GptSummary />);            
                 } else {
                     onSelect(null);
                 }

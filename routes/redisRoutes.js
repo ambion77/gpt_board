@@ -3,6 +3,7 @@ import cors from "cors";
 import { createClient } from "redis"; // ✅ 4.x+ 버전 임포트
 import dotenv from "dotenv";
 import winston from "winston";
+import jwt from "jsonwebtoken";
 
 const router = express.Router();
 router.use(cors());
@@ -19,8 +20,6 @@ const logger = winston.createLogger({
         new winston.transports.File({ filename: 'app.log' })
     ]
 });
-
-logger.info("🚀 Server is running!");
 
 // Redis 클라이언트 생성
 const redisClient = createClient({
@@ -57,6 +56,54 @@ router.get("/visitors", async (req, res) => {
   } catch (err) {
     logger.error("❌ Error:", err);
     res.status(500).json({ error: err.message });
+  }
+});
+
+// 방문자 수 증가
+router.post("/userVisitors", async (req, res) => {
+  try {
+
+      if (!redisClient.isOpen) {
+        return res.status(500).json({ error: "Redis connection closed" });
+      }
+
+      // 요청 헤더에서 JWT 토큰 가져오기
+      const token = req.headers.authorization?.split(" ")[1]; // "Bearer {token}" 형식일 경우
+      if (!token) {
+          return res.status(401).json({ error: "Unauthorized: No token provided" });
+      }
+
+      // JWT 검증 및 payload 추출
+      let payload;
+      try {
+          payload = jwt.verify(token, process.env.VITE_JWT_SECRET); // JWT 시크릿 키 필요
+      } catch (err) {
+          return res.status(401).json({ error: "Invalid Token" });
+      }
+
+      const userId = payload.userid;
+      if (!userId) {
+          return res.status(400).json({ error: "Invalid User Data" });
+      }
+
+      // 오늘 날짜를 YYYYMMDD 형식으로 저장
+      const today = new Date().toISOString().slice(0, 10).replace(/-/g, "");
+      const userVisitKey = `user:${userId}:visits:${today}`;
+
+      // 방문 횟수 증가
+      const visitCount = await redisClient.incr(userVisitKey);
+
+      // 만료 시간 설정 (하루 후 자동 삭제)
+      await redisClient.expire(userVisitKey, 86400); // 24시간 = 86400초
+
+      res.json({
+          message: `User ${userId} visited ${visitCount} times today`,
+          visitCount
+      });
+
+  } catch (err) {
+      logger.error("❌ Error:", err);
+      res.status(500).json({ error: err.message });
   }
 });
 
