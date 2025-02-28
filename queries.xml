@@ -2,8 +2,8 @@
     <query id="getAllUsers">SELECT * FROM users;</query>
     <query id="getUserById">SELECT * FROM users WHERE userid = ?;</query>
     <query id="addUser">INSERT INTO users (userid, username, email, password) VALUES (?, ?, ?, ?);</query>
-    <query id="updateUser">UPDATE users SET username = ?, email = ? WHERE userid = ?;</query>
-    <query id="deleteUser">DELETE FROM users WHERE userid = ?;</query>
+    <query id="updateUser">UPDATE users SET username = ?, email = ? WHERE id = ?;</query>
+    <query id="deleteUser">DELETE FROM users WHERE id = ?;</query>
     <query id="getMenuTree">
           WITH RECURSIVE menu_tree AS (
             SELECT 
