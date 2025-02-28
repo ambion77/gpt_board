@@ -11,7 +11,7 @@ import redisRoutes from "./routes/redisRoutes.js";
 import gptRoutes from "./routes/gptRoutes.js";
 import xmlRoutes from "./routes/xmlRoutes.js";
 import crawlingRoutes from "./routes/crawlingRoutes.js";
-
+import scheduleCrawling from './routes/crawlingScheduleRoutes.js';
 
 if (process.env.NODE_ENV === 'prd') {
     dotenv.config({ path: '.env.prd' });
@@ -35,6 +35,8 @@ const logger = winston.createLogger({
 
 const app = express();
 const PORT = 3000;
+
+scheduleCrawling();
 
 app.use(express.json());
 //app.use(cors());  

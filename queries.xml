@@ -88,6 +88,10 @@
     </query>
     <query id="updateBoard">UPDATE board SET title = ?, content = ? WHERE id = ?;</query>
     <query id="updateBoardView">UPDATE board SET views = views + 1 WHERE id = ?;</query>
-    
+
+    <query id="insertCrawling">
+        INSERT INTO crawling (text, author, crawled_at)
+        VALUES (?, ?, ?);
+    </query>
     
 </queries>
