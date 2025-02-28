@@ -14,31 +14,38 @@ let queries = {};
 // 크롤링 함수
 async function crawlQuotes() {
     try {
-        console.log('=== Starting daily crawling job ===');
-        const { data } = await axios.get("http://quotes.toscrape.com/");
-        const $ = cheerio.load(data);
-        const quotes = [];
+        console.log('=== Starting daily news crawling job ===');
+        const { data } = await axios.get("https://www.yna.co.kr/rss/news.xml");
+        const $ = cheerio.load(data, { xmlMode: true });
+        const news = [];
 
-        $(".quote").each((_, el) => {
-            quotes.push({
-                text: $(el).find(".text").text(),
-                author: $(el).find(".author").text(),
+        // RSS 피드에서 뉴스 아이템 파싱
+        $('item').slice(0, 10).each((_, el) => {
+            const $el = $(el);
+            news.push({
+                title: $el.find('title').text().replace(/\<\!\[CDATA\[(.*?)\]\]\>/g, '$1').trim(),
+                link: $el.find('link').text().trim(),
+                pub_date: new Date($el.find('pubDate').text()),
                 crawled_at: new Date()
             });
         });
 
-        console.log('quotes:'+quotes[0].text);
-        console.log('quotes:'+quotes[0].author);
-        console.log('quotes:'+quotes[0].crawled_at);
-
-        // 모든 quotes 데이터를 순회하면서 데이터베이스에 저장
-        for (const quote of quotes) {
+        // 모든 뉴스 데이터를 순회하면서 데이터베이스에 저장
+        for (const item of news) {
             try {
-                await db.execute(queries.insertCrawling, [quote.text.replace(/['"“”]/g, ''), quote.author, quote.crawled_at]);
-                console.log(`Quote saved: "${quote.text.substring(0, 30)}..."`);
+                console.log(`News title saved: "${item.title}"`);
+                console.log(`News link saved: "${item.link}"`);
+                console.log(`News pub_date saved: "${item.pub_date}"`);
+                console.log(`News crawled_at saved: "${item.crawled_at}"`);
+                await db.execute(queries.insertNews, [
+                    item.title,
+                    item.link,
+                    item.pub_date,
+                    item.crawled_at
+                ]);
             } catch (err) {
-                console.error('Error saving quote:', err);
-                continue; // 한 건이 실패해도 다음 건 계속 진행
+                console.error('Error saving news:', err);
+                continue;
             }
         }
 
@@ -52,7 +59,8 @@ async function crawlQuotes() {
 const scheduleCrawling = () => {
     console.log('=== Crawling scheduler initialized ===');
     // 매일 자정(00:00)에 실행
-    cron.schedule('49 16 * * *', crawlQuotes);
+    // 매시각(매시 00분)에 실행
+    cron.schedule('0 * * * *', crawlQuotes);
 };
 
 export default scheduleCrawling;

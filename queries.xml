@@ -93,5 +93,8 @@
         INSERT INTO crawling (text, author, crawled_at)
         VALUES (?, ?, ?);
     </query>
-    
+    <query id="insertNews">
+        INSERT INTO news (title, link, pub_date, crawled_at)
+        VALUES (?, ?, ?, ?)
+    </query>
 </queries>
