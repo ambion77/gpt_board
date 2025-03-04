@@ -28,7 +28,7 @@ async function crawlQuotes() {
                 title: $el.find('title').text().replace(/\<\!\[CDATA\[(.*?)\]\]\>/g, '$1').trim(),
                 link: $el.find('link').text().trim(),
                 pub_date: new Date($el.find('pubDate').text()),
-                crawled_at: new Date()
+                crawled_date: new Date()
             });
         });
 
@@ -38,12 +38,12 @@ async function crawlQuotes() {
                 console.log(`News title saved: "${item.title}"`);
                 console.log(`News link saved: "${item.link}"`);
                 console.log(`News pub_date saved: "${item.pub_date}"`);
-                console.log(`News crawled_at saved: "${item.crawled_at}"`);
+                console.log(`News crawled_date saved: "${item.crawled_date}"`);
                 await db.execute(queries.insertNews, [
                     item.title,
                     item.link,
                     item.pub_date,
-                    item.crawled_at
+                    item.crawled_date
                 ]);
             } catch (err) {
                 console.error('Error saving news:', err);

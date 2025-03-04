@@ -90,25 +90,25 @@
     <query id="updateBoardView">UPDATE board SET views = views + 1 WHERE id = ?;</query>
 
     <query id="insertCrawling">
-        INSERT INTO crawling (text, author, crawled_at)
+        INSERT INTO crawling (text, author, crawled_date)
         VALUES (?, ?, ?);
     </query>
     <query id="insertNews">
-        INSERT INTO news (title, link, pub_date, crawled_at)
+        INSERT INTO news (title, link, pub_date, crawled_date)
         VALUES (?, ?, ?, ?)
     </query>
 
     <query id="getNewsListWithPagination">
-        SELECT id, title, link, pub_date, crawled_at 
+        SELECT id, title, link, pub_date, crawled_date 
         FROM news 
-        ORDER BY created_at DESC 
+        ORDER BY id DESC 
         LIMIT ? OFFSET ?
     </query>    
     <query id="getNewsListWithPaginationCount">
         SELECT COUNT(*) AS count FROM news
     </query>
     <query id="selectNews">
-        SELECT id, title, link, pub_date, crawled_at 
+        SELECT id, title, link, pub_date, crawled_date
         FROM news 
         ORDER BY pub_date DESC
     </query>
