@@ -11,7 +11,8 @@ import redisRoutes from "./routes/redisRoutes.js";
 import gptRoutes from "./routes/gptRoutes.js";
 import xmlRoutes from "./routes/xmlRoutes.js";
 import crawlingRoutes from "./routes/crawlingRoutes.js";
-import scheduleCrawling from './routes/crawlingScheduleRoutes.js';
+import crawlingScheduleRoutes, { scheduleCrawling } from './routes/crawlingScheduleRoutes.js';
+import crawlingNewsRoutes from './routes/crawlingNewsRoutes.js';
 
 if (process.env.NODE_ENV === 'prd') {
     dotenv.config({ path: '.env.prd' });
@@ -36,7 +37,7 @@ const logger = winston.createLogger({
 const app = express();
 const PORT = 3000;
 
-scheduleCrawling();
+scheduleCrawling(); //크롤링 스케줄러
 
 app.use(express.json());
 //app.use(cors());  
@@ -57,6 +58,8 @@ app.use("/api/redis", redisRoutes); // radis API 추가
 app.use("/api/gpt", gptRoutes); // gpt API 추가
 app.use("/api/xml", xmlRoutes); // xml파일게시판 API 추가
 app.use("/api/crawling", crawlingRoutes); // 크롤링 API 추가
+app.use("/api/crawlingScheduleRoutes", crawlingScheduleRoutes); // 크롤링스케쥴 API 추가
+app.use("/api/crawlingNews", crawlingNewsRoutes); // 크롤링뉴스 API 추가
 
 app.listen(PORT, () => {
     logger.info(`🚀 서버 실행 중: ${process.env.VITE_API_URL}`);

@@ -985,3 +985,7 @@ input[type="checkbox"] {
 .pagination button {
     margin: 0 5px;
 }
+
+.text_align_center{
+  text-align: center;
+}

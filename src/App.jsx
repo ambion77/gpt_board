@@ -7,6 +7,7 @@ import Images from "./Images";
 import Visitors from "./Visitors";
 import GptSummary from "./GptSummary";
 import WebCrawling from "./WebCrawling";
+import CrawlingNews from "./CrawlingNews";
 
 const menuData = [
     { "id": 10, "menuid": "M001", "menuname": "시스템관리", "depth": 0, "url": "" },
@@ -19,9 +20,10 @@ const menuData = [
     { "id": 23, "menuid": "M00203", "menuname": "이미지 게시판", "depth": 1, "url": "Images" },
 
     { "id": 30, "menuid": "M003", "menuname": "외부연동관리", "depth": 0, "url": "" },
-    { "id": 31, "menuid": "M00301", "menuname": "web clawling", "depth": 1, "url": "WebCrawling" },
-    { "id": 32, "menuid": "M00302", "menuname": "redis", "depth": 1, "url": "Visitors" },
-    { "id": 33, "menuid": "M00303", "menuname": "Gpt요약", "depth": 1, "url": "GptSummary" },
+    { "id": 31, "menuid": "M00301", "menuname": "웹크롤링", "depth": 1, "url": "WebCrawling" },
+    { "id": 32, "menuid": "M00302", "menuname": "최신뉴스", "depth": 1, "url": "CrawlingNews" },
+    { "id": 33, "menuid": "M00303", "menuname": "redis", "depth": 1, "url": "Visitors" },
+    { "id": 34, "menuid": "M00304", "menuname": "Gpt요약", "depth": 1, "url": "GptSummary" },
 ];
 
 const MenuItem = ({ item, onSelect, activeMenu, setActiveMenu, setNavigator }) => {
@@ -43,10 +45,12 @@ const MenuItem = ({ item, onSelect, activeMenu, setActiveMenu, setNavigator }) =
                 }else if (item.menuid === "M00203") {
                     onSelect(<Images />);
                 } else if (item.menuid === "M00301") {
-                    onSelect(<WebCrawling />);    
+                    onSelect(<WebCrawling />); 
                 } else if (item.menuid === "M00302") {
+                    onSelect(<CrawlingNews />);        
+                } else if (item.menuid === "M00303") {
                     onSelect(<Visitors />);        
-                }else if (item.menuid === "M00303") {
+                }else if (item.menuid === "M00304") {
                     onSelect(<GptSummary />);            
                 } else {
                     onSelect(null);

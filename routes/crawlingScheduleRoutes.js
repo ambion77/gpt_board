@@ -1,9 +1,11 @@
+import express from 'express';
 import cron from 'node-cron';
 import axios from 'axios';
 import * as cheerio from 'cheerio';
 import db from "../db.js"; // MySQL 연결 파일
 import loadQueries from "../queryLoader.js"; // XML 기반 쿼리 로더
 
+const router = express.Router();
 let queries = {};
 
 // 🔹 XML 쿼리 로드 (비동기)
@@ -49,18 +51,35 @@ async function crawlQuotes() {
             }
         }
 
-        console.log(`=== Successfully saved ${quotes.length} quotes to database ===`);
+        console.log(`=== Successfully saved quotes to database ===`);
+        return news;
     } catch (error) {
         console.error('Crawling job failed:', error);
+        throw error;
     }
 }
 
 // 매일 자정에 실행되는 스케줄러
 const scheduleCrawling = () => {
     console.log('=== Crawling scheduler initialized ===');
-    // 매일 자정(00:00)에 실행
-    // 매시각(매시 00분)에 실행
-    cron.schedule('0 * * * *', crawlQuotes);
+    // 매일 자정(0 0 * * *)에 실행
+    // 매시각(0 * * * *)에 실행
+    cron.schedule('0 14 * * *', crawlQuotes);
 };
 
-export default scheduleCrawling;
+// 크롤링 수동 실행 API
+router.get("/crawling", async (req, res) => {
+    try {
+        const news = await crawlQuotes(); // crawlQuotes를 호출
+        res.json({ 
+            message: '크롤링이 성공적으로 완료되었습니다.',
+            newsCount: news.length
+        });
+    } catch (error) {
+        console.error('크롤링 실행 실패:', error);
+        res.status(500).json({ error: '크롤링 실행 중 오류가 발생했습니다.' });
+    }
+});
+
+export default router;  // default export 추가. server.js에서 crawlingScheduleRoutes 이름으로 import 가능
+export { scheduleCrawling };    // server.js에서 scheduleCrawling 함수를 내보내기

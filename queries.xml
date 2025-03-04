@@ -97,4 +97,19 @@
         INSERT INTO news (title, link, pub_date, crawled_at)
         VALUES (?, ?, ?, ?)
     </query>
+
+    <query id="getNewsListWithPagination">
+        SELECT id, title, link, pub_date, crawled_at 
+        FROM news 
+        ORDER BY created_at DESC 
+        LIMIT ? OFFSET ?
+    </query>    
+    <query id="getNewsListWithPaginationCount">
+        SELECT COUNT(*) AS count FROM news
+    </query>
+    <query id="selectNews">
+        SELECT id, title, link, pub_date, crawled_at 
+        FROM news 
+        ORDER BY pub_date DESC
+    </query>
 </queries>
