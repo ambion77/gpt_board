@@ -112,4 +112,8 @@
         FROM news 
         ORDER BY pub_date DESC
     </query>
+
+    <query id="insertExcelFile">
+        INSERT INTO excel_file (file_name, file_data) VALUES (?, ?);
+    </query>
 </queries>
