@@ -14,24 +14,24 @@ const router = express.Router();
 
 // XML 데이터 파일저장
 router.post('/upload', bodyParser.json(), (req, res) => {
-    const { xml } = req.body;
+    const { xml, title,fileName } = req.body;
     console.log('Received XML:', xml);
 
      // 1. XML 데이터를 파일로 저장
-     const filePath = path.join(__dirname, '../upload', 'uploadedData.xml');
+     const filePath = path.join(__dirname, '../upload', fileName);
      fs.writeFile(filePath, xml, (err) => {
          if (err) {
              console.error('XML 데이터 저장 실패:', err);
              return res.status(500).json({ error: 'XML 데이터 저장 중 오류가 발생했습니다.' });
          }
-         console.log('XML 데이터가 성공적으로 저장되었습니다.');
+         console.log(title+'XML 데이터가 성공적으로 저장되었습니다.');
          res.status(200).json({ message: 'XML 데이터가 성공적으로 저장되었습니다.' });
      });
 });
 
 // XML 데이터 수신 및 저장
 router.post('/save', bodyParser.json(), async (req, res) => {
-    const { xml, fileName } = req.body;
+    const { xml, title, fileName } = req.body;
     console.log('Received XML:', xml);
 
     // XML 데이터를 데이터베이스에 저장
@@ -40,16 +40,16 @@ router.post('/save', bodyParser.json(), async (req, res) => {
         
         // 컬럼명 저장
         await db.query(
-            'INSERT INTO excel_data (file_name, rownum, column1, column2, column3, column4, column5, column6, column7, column8, column9, column10) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
-            [fileName, 0, ...headers, null, null, null, null, null, null, null].slice(0, 12)
+            'INSERT INTO excel_data (title,file_name, rownum, column1, column2, column3, column4, column5, column6, column7, column8, column9, column10) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
+            [title, fileName, 0, ...headers, null, null, null, null, null, null, null].slice(0, 13)
         );
 
         // 데이터 행 저장
         for (let i = 0; i < rows.length; i++) {
             const row = rows[i];
             await db.query(
-                'INSERT INTO excel_data (file_name, rownum, column1, column2, column3, column4, column5, column6, column7, column8, column9, column10) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
-                [fileName, i + 1, ...row, null, null, null, null, null, null, null].slice(0, 12)
+                'INSERT INTO excel_data (title, file_name, rownum, column1, column2, column3, column4, column5, column6, column7, column8, column9, column10) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
+                [title, fileName, i + 1, ...row, null, null, null, null, null, null, null].slice(0, 13)
             );
         }
         console.log('데이터베이스에 데이터가 성공적으로 저장되었습니다.');
@@ -98,7 +98,7 @@ async function parseXmlToRows(xml) {
 
 // 파일 업로드 및 BLOB 저장
 router.post('/blob', bodyParser.json(), async (req, res) => {
-    const { fileName, fileData } = req.body; // fileData는 base64 인코딩된 파일 데이터
+    const {title, fileName, fileData } = req.body; // fileData는 base64 인코딩된 파일 데이터
     console.log('Received file:', fileName);
 
     // base64 데이터를 버퍼로 변환
@@ -107,8 +107,8 @@ router.post('/blob', bodyParser.json(), async (req, res) => {
     // 데이터베이스에 파일 저장
     try {
         await db.execute(
-            'INSERT INTO excel_file (file_name, file_data) VALUES (?, ?)',
-            [fileName, buffer]
+            'INSERT INTO excel_file (title, file_name, file_data) VALUES (?, ?, ?)',
+            [title, fileName, buffer]
         );
         console.log('BLOB 파일이 데이터베이스에 성공적으로 저장되었습니다.');
         res.status(200).json({ message: 'BLOB 파일이 성공적으로 저장되었습니다.' });

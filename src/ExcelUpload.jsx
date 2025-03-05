@@ -4,6 +4,7 @@ import axios from 'axios';
 
 const ExcelUpload = () => {
     const [file, setFile] = useState(null);
+    const [title, setTitle] = useState('');
     const [tableData, setTableData] = useState([]);
     const [xmlData, setXmlData] = useState('');
 
@@ -13,9 +14,18 @@ const ExcelUpload = () => {
         setFile(event.target.files[0]);
     };
 
+    const handleTitleChange = (event) => {
+        setTitle(event.target.value);
+    };
+
     const handleUpload = async () => {
         if (!file) {
             alert('파일을 선택하세요.');
+            return;
+        }
+
+        if (!title) {
+            alert('제목을 입력하세요.');
             return;
         }
 
@@ -36,7 +46,7 @@ const ExcelUpload = () => {
             setXmlData(xml);
 
             // 서버로 XML 데이터 전송
-            await axios.post(`${apiUrl}/api/excel/upload`, { xml });
+            await axios.post(`${apiUrl}/api/excelUpload/upload`, { xml ,title, fileName: file.name });
 
             // 테이블 데이터 설정
             setTableData([headers, ...rows]);
@@ -67,7 +77,7 @@ const ExcelUpload = () => {
             setXmlData(xml);
 
             // 서버로 XML 데이터와 파일 이름 전송
-            await axios.post(`${apiUrl}/api/excel/save`, { xml, fileName: file.name });
+            await axios.post(`${apiUrl}/api/excelUpload/save`, { xml, title, fileName: file.name });
             
             // 테이블 데이터 설정
             setTableData([headers, ...rows]);
@@ -107,8 +117,7 @@ const ExcelUpload = () => {
             const base64Data = e.target.result.split(',')[1]; // base64 데이터 추출
 
             // 서버로 파일 이름과 base64 데이터 전송
-           // await axios.post('/api/upload', { fileName: file.name, fileData: base64Data });
-            await axios.post(`${apiUrl}/api/excel/blob`, { fileName: file.name, fileData: base64Data});
+            await axios.post(`${apiUrl}/api/excelUpload/blob`, {title, fileName: file.name, fileData: base64Data});
             alert('BLOB 파일이 성공적으로 업로드되었습니다.');
         };
         reader.readAsDataURL(file); // 파일을 base64로 읽기
@@ -117,6 +126,12 @@ const ExcelUpload = () => {
     return (
         <div>
             <h1>엑셀 업로드</h1>
+            <input
+                type="text"
+                placeholder="제목을 입력하세요"
+                value={title}
+                onChange={handleTitleChange}
+            />
             <input type="file" accept=".xlsx, .xls" onChange={handleFileChange} className="mb-4" />
             <button
                 onClick={handleUpload}
