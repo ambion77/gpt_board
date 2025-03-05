@@ -8,6 +8,7 @@ import Visitors from "./Visitors";
 import GptSummary from "./GptSummary";
 import WebCrawling from "./WebCrawling";
 import CrawlingNews from "./CrawlingNews";
+import ExcelUpload from "./ExcelUpload";
 
 const menuData = [
     { "id": 10, "menuid": "M001", "menuname": "시스템관리", "depth": 0, "url": "" },
@@ -24,6 +25,8 @@ const menuData = [
     { "id": 32, "menuid": "M00302", "menuname": "최신뉴스", "depth": 1, "url": "CrawlingNews" },
     { "id": 33, "menuid": "M00303", "menuname": "redis", "depth": 1, "url": "Visitors" },
     { "id": 34, "menuid": "M00304", "menuname": "Gpt요약", "depth": 1, "url": "GptSummary" },
+    { "id": 35, "menuid": "M00305", "menuname": "ExcelUpload", "depth": 1, "url": "ExcelUpload" },
+    
 ];
 
 const MenuItem = ({ item, onSelect, activeMenu, setActiveMenu, setNavigator }) => {
@@ -51,7 +54,9 @@ const MenuItem = ({ item, onSelect, activeMenu, setActiveMenu, setNavigator }) =
                 } else if (item.menuid === "M00303") {
                     onSelect(<Visitors />);        
                 }else if (item.menuid === "M00304") {
-                    onSelect(<GptSummary />);            
+                    onSelect(<GptSummary />);
+                }else if (item.menuid === "M00305") {
+                    onSelect(<ExcelUpload />);      
                 } else {
                     onSelect(null);
                 }

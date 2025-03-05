@@ -19,7 +19,6 @@ router.get('/news', async (req, res) => {
       const [news] = await db.query(queries.getNewsListWithPagination, [limit, offset]);
       const [totalRows] = await db.query(queries.getNewsListWithPaginationCount); // 총 뉴스 개수 조회
       const totalCount = totalRows[0].count; // 총 개수
-      console.log('totalCount:', totalCount);
 
       res.json({
           news,

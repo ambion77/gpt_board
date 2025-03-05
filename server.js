@@ -13,6 +13,7 @@ import xmlRoutes from "./routes/xmlRoutes.js";
 import crawlingRoutes from "./routes/crawlingRoutes.js";
 import crawlingScheduleRoutes, { scheduleCrawling } from './routes/crawlingScheduleRoutes.js';
 import crawlingNewsRoutes from './routes/crawlingNewsRoutes.js';
+import excelRoutes from './routes/excelRoutes.js';
 
 if (process.env.NODE_ENV === 'prd') {
     dotenv.config({ path: '.env.prd' });
@@ -60,6 +61,8 @@ app.use("/api/xml", xmlRoutes); // xml파일게시판 API 추가
 app.use("/api/crawling", crawlingRoutes); // 크롤링 API 추가
 app.use("/api/crawlingScheduleRoutes", crawlingScheduleRoutes); // 크롤링스케쥴 API 추가
 app.use("/api/crawlingNews", crawlingNewsRoutes); // 크롤링뉴스 API 추가
+
+app.use('/api/excel', excelRoutes);
 
 app.listen(PORT, () => {
     logger.info(`🚀 서버 실행 중: ${process.env.VITE_API_URL}`);
