@@ -116,4 +116,16 @@
     <query id="insertExcelFile">
         INSERT INTO excel_file (file_name, file_data) VALUES (?, ?);
     </query>
+    <query id="getExcelDataList">        
+        SELECT main_id, title, file_name, DATE_FORMAT(MIN(created_date), "%Y/%m/%d %T")  AS created_date 
+        FROM excel_data 
+        GROUP BY main_id, title, file_name 
+        ORDER BY created_date DESC
+    </query>    
+    <query id="getExcelDataDetail">
+        SELECT * 
+        FROM excel_data 
+        WHERE title = ? AND file_name = ? 
+        ORDER BY rownum
+    </query>  
 </queries>

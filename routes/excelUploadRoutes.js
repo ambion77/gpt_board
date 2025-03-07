@@ -5,12 +5,20 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import xml2js from 'xml2js';
 import db from "../db.js"; // MySQL 연결 파일
+import loadQueries from "../queryLoader.js"; // XML 기반 쿼리 로더
 
 // __filename과 __dirname 구현
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const router = express.Router();
+
+let queries = {};
+
+// 🔹 XML 쿼리 로드 (비동기)
+(async () => {
+  queries = await loadQueries();
+})();
 
 // XML 데이터 파일저장
 router.post('/upload', bodyParser.json(), (req, res) => {
@@ -37,19 +45,23 @@ router.post('/save', bodyParser.json(), async (req, res) => {
     // XML 데이터를 데이터베이스에 저장
     try {
         const { headers, rows } = await parseXmlToRows(xml);
+
+        // 기존 main_id 값 중 최대값을 가져오기
+        const [maxMainIdResult] = await db.query('SELECT MAX(main_id) AS maxMainId FROM excel_data');
+        const newMainId = (maxMainIdResult[0].maxMainId || 0) + 1; // 기존 최대값에 1을 더함
         
-        // 컬럼명 저장
+        // 1.컬럼명 저장
         await db.query(
-            'INSERT INTO excel_data (title,file_name, rownum, column1, column2, column3, column4, column5, column6, column7, column8, column9, column10) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
-            [title, fileName, 0, ...headers, null, null, null, null, null, null, null].slice(0, 13)
+            'INSERT INTO excel_data (main_id, title,file_name, rownum, column1, column2, column3, column4, column5, column6, column7, column8, column9, column10) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
+            [newMainId, title, fileName, 0, ...headers, null, null, null, null, null, null, null, null].slice(0, 14)
         );
 
-        // 데이터 행 저장
+        // 2.데이터 행 저장
         for (let i = 0; i < rows.length; i++) {
             const row = rows[i];
             await db.query(
-                'INSERT INTO excel_data (title, file_name, rownum, column1, column2, column3, column4, column5, column6, column7, column8, column9, column10) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
-                [title, fileName, i + 1, ...row, null, null, null, null, null, null, null].slice(0, 13)
+                'INSERT INTO excel_data (main_id, title, file_name, rownum, column1, column2, column3, column4, column5, column6, column7, column8, column9, column10) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
+                [newMainId, title, fileName, i + 1, ...row, null, null, null, null, null, null, null, null].slice(0, 14)
             );
         }
         console.log('데이터베이스에 데이터가 성공적으로 저장되었습니다.');

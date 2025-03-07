@@ -10,6 +10,7 @@ import WebCrawling from "./WebCrawling";
 import CrawlingNews from "./CrawlingNews";
 import ExcelUpload from "./ExcelUpload";
 import ExcelDownload from "./ExcelDownload";
+import ExcelList from "./ExcelList";
 
 const menuData = [
     { "id": 10, "menuid": "M001", "menuname": "시스템관리", "depth": 0, "url": "" },
@@ -30,6 +31,7 @@ const menuData = [
     { "id": 40, "menuid": "M004", "menuname": "유틸기능관리", "depth": 0, "url": "" },
     { "id": 41, "menuid": "M00401", "menuname": "ExcelUpload", "depth": 1, "url": "ExcelUpload" },
     { "id": 42, "menuid": "M00402", "menuname": "ExcelDownload", "depth": 1, "url": "ExcelDownload" },
+    { "id": 43, "menuid": "M00403", "menuname": "Excel데이터", "depth": 1, "url": "Excellist" },
     
 ];
 
@@ -62,7 +64,9 @@ const MenuItem = ({ item, onSelect, activeMenu, setActiveMenu, setNavigator }) =
                 }else if (item.menuid === "M00401") {
                     onSelect(<ExcelUpload />);  
                 }else if (item.menuid === "M00402") {
-                    onSelect(<ExcelDownload />);          
+                    onSelect(<ExcelDownload />);    
+                }else if (item.menuid === "M00403") {
+                    onSelect(<ExcelList />);              
                 } else {
                     onSelect(null);
                 }
@@ -131,7 +135,7 @@ const App = () => {
     return (
         <div className="app-container">
             <header className="header">
-                <div className="logo">MyApp</div>
+                <div className="logo">AMBION</div>
                 <nav className="nav">경로: {navigator}</nav>
                 {payload ? (
                     <div className="logo">
