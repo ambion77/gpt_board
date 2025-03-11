@@ -45,7 +45,7 @@ const ExcelDownload = () => {
                         <tr>
                             <th>번호</th>
                             <th>제목</th>
-                            <th>파일명</th>
+                            <th>파일다운로드</th>
                             <th>생성일자</th>
                         </tr>
                     </thead>

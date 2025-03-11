@@ -169,12 +169,36 @@ GET 방식 http://localhost:3000/api/users/admin
 
 GET 방식 http://localhost:3000/api/users
 
+# 1.서버실행방법
+1. aws 운영실행
+pm2 start npm --name myserver -- run prd
 
-# React + Vite
+2. 종료
+*pm으로 떠있는 프로세서 종료
+pm2 stop all
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+*pm2 list(목록보기)
+pm2 delete myserver(myserver 목록지우기)
 
-Currently, two official plugins are available:
+3. 커밋된 소스 강제로 가져오기
+3-1. git pull 받을 목록을 repository 에서 업데이트
+git fetch --all
+3-2. git reset 으로 head를 최신으로 가리킨다
+git reset --hard origin
+3-3. git pull 로 확인
+git pull
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+# 2.Docker로 실행방법
+1. docker 설치
+
+2. git clone 내소스URL
+  2-1. 환경파일(.env.prd) 추가
+
+3. Docker파일만들기
+Dockerfile
+
+4. docker빌드
+docker build -t my-app . 
+
+4. docker실행
+docker run -p 5173:5173 -p 3000:3000 my-app
