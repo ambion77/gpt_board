@@ -19,9 +19,9 @@ router.get("/trends", async (req, res) => {
         });
     
         const trends = await page.evaluate(() => {
-          return Array.from(document.querySelectorAll(".enOdEe-wZVHld-xMbwt")).map((el) => {
+          return Array.from(document.querySelectorAll(".enOdEe-wZVHld-xMbwt")).map((el) => {  //tr tag 클래스명이 수시로 변함.개발자도구에서 확인후 계속변경
           return {
-              title: el.querySelector(".mZ3RIc").innerText,
+              title: el.querySelector(".mZ3RIc").innerText, //tr>td>div tag 클래스명이 수시로 변함.개발자도구에서 확인후 계속변경
               //link: el.querySelector("a")?.href || "#",
             };
           });
