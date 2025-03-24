@@ -4,6 +4,7 @@ import { createClient } from "redis"; // ✅ 4.x+ 버전 임포트
 import dotenv from "dotenv";
 import winston from "winston";
 import jwt from "jsonwebtoken";
+import telegramBot from "node-telegram-bot-api";
 
 const router = express.Router();
 router.use(cors());
@@ -27,8 +28,32 @@ const redisClient = createClient({
 });
 
 // 연결 이벤트 핸들링
-redisClient.on('connect', () => logger.info('✅ Redis Connected'))
-          .on('error', err => logger.error('❌ Redis Error:', err));
+redisClient.on('connect', () => {
+  logger.info('✅ Redis Connected');
+  sendTelegramMessage('✅ Redis Connected'); // Telegram 메시지 전송
+});
+
+// Redis 클라이언트 오류 처리
+redisClient.on('error', (err) => {
+  logger.error('Redis error:', err);
+  sendTelegramMessage('✅ Redis error:'+err); // Telegram 메시지 전송
+});
+
+//텔레그램 연동 시작////////////////////
+const TOKEN = `${process.env.VITE_TELEGRAM_BOT_API_KEY}`; // BotFather에서 받은 토큰
+const CHAT_ID = `${process.env.VITE_TELEGRAM_CHAT_ID}`; // 메시지를 받을 채팅 ID
+
+const bot = new telegramBot(TOKEN, { polling: false });
+
+async function sendTelegramMessage(message) {
+  try {
+    await bot.sendMessage(CHAT_ID, message);
+    console.log("✅ Telegram 메시지 전송 성공!");
+  } catch (error) {
+    console.error("❌ 메시지 전송 실패:", error);
+  }
+}
+//텔레그램 연동 끝////////////////////
 
 // 명시적 연결
 await redisClient.connect();
