@@ -17,6 +17,7 @@ import excelUploadRoutes from './routes/excelUploadRoutes.js';
 import excelDownloadRoutes from './routes/excelDownloadRoutes.js';
 import excelRoutes from './routes/excelRoutes.js';
 import googleTrendsRoutes from './routes/googleTrendsRoutes.js';
+import watchLog from './watchLog.js';
 
 if (process.env.NODE_ENV === 'prd') {
     dotenv.config({ path: '.env.prd' });
@@ -69,6 +70,7 @@ app.use("/api/googleTrends", googleTrendsRoutes); // 구글트렌드 API 추가
 app.use('/api/excelUpload', excelUploadRoutes);
 app.use('/api/excelDownload', excelDownloadRoutes);
 app.use('/api/excel', excelRoutes);
+
 
 app.listen(PORT, () => {
     logger.info(`🚀 서버 실행 중: ${process.env.VITE_API_URL}`);
