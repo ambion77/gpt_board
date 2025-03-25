@@ -31,7 +31,7 @@ const menuData = [
     { "id": 33, "menuid": "M00303", "menuname": "redis", "depth": 1, "url": "Visitors" },
     { "id": 34, "menuid": "M00304", "menuname": "Gpt요약", "depth": 1, "url": "GptSummary" },
     { "id": 35, "menuid": "M00305", "menuname": "map", "depth": 1, "url": "Map" },
-    { "id": 36, "menuid": "M00306", "menuname": "구글트렌드", "depth": 1, "url": "Map" },
+    { "id": 36, "menuid": "M00306", "menuname": "구글트렌드", "depth": 1, "url": "GoogleTrends" },
 
     { "id": 40, "menuid": "M004", "menuname": "유틸기능관리", "depth": 0, "url": "" },
     { "id": 41, "menuid": "M00401", "menuname": "ExcelUpload", "depth": 1, "url": "ExcelUpload" },
@@ -47,52 +47,56 @@ const menuData = [
 const MenuItem = ({ item, onSelect, activeMenu, setActiveMenu, setNavigator }) => {
     const isOpen = activeMenu === item.menuid;
 
+    const handleClick = () => {
+        if (item.depth === 0) {
+            setActiveMenu(isOpen ? null : item.menuid);
+        }
+        setNavigator(item.menuname);
+        if (item.menuid === "M00101") {
+            onSelect(<MenuTree />);
+        } else if (item.menuid === "M00102") {
+            onSelect(<User />);
+        } else if (item.menuid === "M00201") {
+            onSelect(<Board />);
+        } else if (item.menuid === "M00202") {
+            onSelect(<BoardList />);
+        } else if (item.menuid === "M00203") {
+            onSelect(<Images />);
+        } else if (item.menuid === "M00301") {
+            onSelect(<WebCrawling />);
+        } else if (item.menuid === "M00302") {
+            onSelect(<CrawlingNews />);
+        } else if (item.menuid === "M00303") {
+            onSelect(<Visitors />);
+        } else if (item.menuid === "M00304") {
+            onSelect(<GptSummary />);
+        } else if (item.menuid === "M00305") {
+            onSelect(<Map />);
+        } else if (item.menuid === "M00306") {
+            onSelect(<GoogleTrends />);
+        } else if (item.menuid === "M00401") {
+            onSelect(<ExcelUpload />);
+        } else if (item.menuid === "M00402") {
+            onSelect(<ExcelDownload />);
+        } else if (item.menuid === "M00403") {
+            onSelect(<ExcelList />);
+        } else if (item.menuid === "M00501") {
+            onSelect(<TypingGame />);
+        } else if (item.menuid === "M00502") {
+            onSelect(<iframe src="./etc/tetris.html" width="100%" height="100%" />); //tetris게임추가.react로 개발시 설치모듈 너무 많음
+        } else if (item.menuid === "M00503") {
+            onSelect(<iframe src="./etc/typing.html" width="100%" height="100%" />);
+        } else {
+            onSelect(null);
+        }
+    };
+
     return (
         <div>
-            <div className="menu-item" onClick={() => {
-                setActiveMenu(isOpen ? null : item.menuid);
-                setNavigator(item.menuname);
-                if (item.menuid === "M00101") {
-                    onSelect(<MenuTree />);
-                }else if (item.menuid === "M00102") {
-                    onSelect(<User />);
-                } else if (item.menuid === "M00201") {
-                    onSelect(<Board />);
-                } else if (item.menuid === "M00202") {
-                    onSelect(<BoardList />);
-                }else if (item.menuid === "M00203") {
-                    onSelect(<Images />);
-                } else if (item.menuid === "M00301") {
-                    onSelect(<WebCrawling />); 
-                } else if (item.menuid === "M00302") {
-                    onSelect(<CrawlingNews />);        
-                } else if (item.menuid === "M00303") {
-                    onSelect(<Visitors />);        
-                }else if (item.menuid === "M00304") {
-                    onSelect(<GptSummary />);
-                }else if (item.menuid === "M00305") {
-                    onSelect(<Map />);    
-                }else if (item.menuid === "M00306") {
-                    onSelect(<GoogleTrends />);
-                }else if (item.menuid === "M00401") {
-                    onSelect(<ExcelUpload />);  
-                }else if (item.menuid === "M00402") {
-                    onSelect(<ExcelDownload />);    
-                }else if (item.menuid === "M00403") {
-                    onSelect(<ExcelList />);  
-                }else if (item.menuid === "M00501") {
-                    onSelect(<TypingGame />);
-                } else if (item.menuid === "M00502") {
-                    onSelect(<iframe src="./etc/tetris.html" width="100%" height="100%" />); //tetris게임추가.react로 개발시 설치모듈 너무 많음
-                } else if (item.menuid === "M00503") {
-                    onSelect(<iframe src="./etc/typing.html" width="100%" height="100%" />);    
-                } else {
-                    onSelect(null);
-                }
-            }}>
+            <div className="menu-item" onClick={handleClick}>
                 {item.menuname}
             </div>
-            {isOpen && item.children.length > 0 && (
+            {isOpen && item.children && item.children.length > 0 && (
                 <div className="submenu">
                     {item.children.map(child => (
                         <MenuItem key={child.id} item={child} onSelect={onSelect} activeMenu={activeMenu} setActiveMenu={setActiveMenu} setNavigator={setNavigator} />
@@ -106,11 +110,11 @@ const MenuItem = ({ item, onSelect, activeMenu, setActiveMenu, setNavigator }) =
 const Menu = ({ onSelect, setNavigator }) => {
     const [activeMenu, setActiveMenu] = useState(null);
     const menuMap = {};
-    
+
     menuData.forEach(item => {
         menuMap[item.menuid] = { ...item, children: [] };
     });
-    
+
     menuData.forEach(item => {
         if (item.depth > 0) {
             const parentId = item.menuid.substring(0, item.menuid.length - 2);
@@ -119,7 +123,7 @@ const Menu = ({ onSelect, setNavigator }) => {
             }
         }
     });
-    
+
     return (
         <div className="menu">
             {Object.values(menuMap).map(item => (
@@ -136,19 +140,19 @@ const App = () => {
     // 토큰 확인
     const jwtToken = localStorage.getItem("jwt");
     console.log("토큰:", jwtToken);
-    let tokenParts=null;
-    let payload=null;
-    if (jwtToken !=null) {
+    let tokenParts = null;
+    let payload = null;
+    if (jwtToken != null) {
         // 토큰 분해
         tokenParts = jwtToken.split('.');
         // 페이로드 추출 (Base64 디코딩)
-        payload = JSON.parse(atob(tokenParts[1]));        
+        payload = JSON.parse(atob(tokenParts[1]));
         console.log("사용자 정보:", payload);
     }
-    
+
     const userLogOut = () => {
         localStorage.removeItem("jwt");
-        setTimeout(() => window.location.href = "/login.html", 1000); 
+        setTimeout(() => window.location.href = "/login.html", 1000);
     };
 
     return (
@@ -161,7 +165,7 @@ const App = () => {
                         <span>{payload.userid} 님 안녕하세요</span>
                         <button onClick={userLogOut} className="logout-button">로그아웃</button>
                     </div>
-                ):(
+                ) : (
                     <div className="logo">
                         <button onClick={userLogOut} className="logout-button">로그인</button>
                     </div>
