@@ -40,7 +40,8 @@ const menuData = [
 
     { "id": 50, "menuid": "M005", "menuname": "게임", "depth": 0, "url": "" },
     { "id": 51, "menuid": "M00501", "menuname": "타자연습", "depth": 1, "url": "TypingGame" },
-    { "id": 52, "menuid": "M00502", "menuname": "테트리스", "depth": 1, "url": "Tetris" }
+    { "id": 52, "menuid": "M00502", "menuname": "테트리스", "depth": 1, "url": "Tetris" },
+    { "id": 53, "menuid": "M00503", "menuname": "타이핑연습", "depth": 1, "url": "Typing" }
 ];
 
 const MenuItem = ({ item, onSelect, activeMenu, setActiveMenu, setNavigator }) => {
@@ -82,7 +83,9 @@ const MenuItem = ({ item, onSelect, activeMenu, setActiveMenu, setNavigator }) =
                 }else if (item.menuid === "M00501") {
                     onSelect(<TypingGame />);
                 } else if (item.menuid === "M00502") {
-                    onSelect(<iframe src="tetris.html" width="100%" height="600px" />); //tetris게임추가.react로 개발시 설치모듈 너무 많음
+                    onSelect(<iframe src="./etc/tetris.html" width="100%" height="100%" />); //tetris게임추가.react로 개발시 설치모듈 너무 많음
+                } else if (item.menuid === "M00503") {
+                    onSelect(<iframe src="./etc/typing.html" width="100%" height="100%" />);    
                 } else {
                     onSelect(null);
                 }
