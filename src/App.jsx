@@ -39,7 +39,8 @@ const menuData = [
     { "id": 43, "menuid": "M00403", "menuname": "Excel데이터", "depth": 1, "url": "Excellist" },
 
     { "id": 50, "menuid": "M005", "menuname": "게임", "depth": 0, "url": "" },
-    { "id": 51, "menuid": "M00501", "menuname": "타자연습", "depth": 1, "url": "TypingGame" }
+    { "id": 51, "menuid": "M00501", "menuname": "타자연습", "depth": 1, "url": "TypingGame" },
+    { "id": 52, "menuid": "M00502", "menuname": "테트리스", "depth": 1, "url": "Tetris" }
 ];
 
 const MenuItem = ({ item, onSelect, activeMenu, setActiveMenu, setNavigator }) => {
@@ -79,7 +80,9 @@ const MenuItem = ({ item, onSelect, activeMenu, setActiveMenu, setNavigator }) =
                 }else if (item.menuid === "M00403") {
                     onSelect(<ExcelList />);  
                 }else if (item.menuid === "M00501") {
-                    onSelect(<TypingGame />);                  
+                    onSelect(<TypingGame />);
+                } else if (item.menuid === "M00502") {
+                    onSelect(<iframe src="tetris.html" width="100%" height="600px" />); //tetris게임추가.react로 개발시 설치모듈 너무 많음
                 } else {
                     onSelect(null);
                 }
