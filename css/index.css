@@ -1041,3 +1041,19 @@ input[type="checkbox"] {
   text-decoration: none;
   cursor: pointer;
 }
+
+/*left menu hide*/
+.left-panel {
+  width: 200px; /* 기본 너비 */
+  background-color: #f0f0f0;
+  transition: width 0.5s ease-in-out; /* Smooth transition for width */
+  overflow: hidden; /* Hide overflowing content */
+}
+
+.left-panel.collapsed {
+  width: 0px; /* 축소된 너비 */
+}
+
+.menu {
+  width: 100%;
+}

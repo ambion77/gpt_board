@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import MenuTree from "./MenuTree";
 import Board from "./Board";
 import BoardList from "./BoardList";
@@ -136,6 +136,10 @@ const Menu = ({ onSelect, setNavigator }) => {
 const App = () => {
     const [content, setContent] = useState(null);
     const [navigator, setNavigator] = useState("홈");
+    const [isMenuExpanded, setIsMenuExpanded] = useState(true); // 메뉴 확장 여부 상태
+    const menuPanelRef = useRef(null);
+    let hideTimeout = useRef(null);
+    let showTimeout = useRef(null);
 
     // 토큰 확인
     const jwtToken = localStorage.getItem("jwt");
@@ -155,6 +159,27 @@ const App = () => {
         setTimeout(() => window.location.href = "/login.html", 1000);
     };
 
+    const handleMouseEnter = () => {
+        clearTimeout(hideTimeout.current);
+        showTimeout.current = setTimeout(() => {
+            setIsMenuExpanded(true);
+        }, 100); // 0.1초 후 메뉴 확장
+    };
+
+    const handleMouseLeave = () => {
+        clearTimeout(showTimeout.current);
+        hideTimeout.current = setTimeout(() => {
+            setIsMenuExpanded(false);
+        }, 2000); // 2초 후 메뉴 축소
+    };
+
+    useEffect(() => {
+        return () => {
+            clearTimeout(hideTimeout.current);
+            clearTimeout(showTimeout.current);
+        };
+    }, []);
+
     return (
         <div className="app-container">
             <header className="header">
@@ -172,7 +197,12 @@ const App = () => {
                 )}
             </header>
             <div className="main-container">
-                <div className="left-panel">
+                <div
+                    className={`left-panel ${isMenuExpanded ? 'expanded' : 'collapsed'}`}
+                    ref={menuPanelRef}
+                    onMouseEnter={handleMouseEnter}
+                    onMouseLeave={handleMouseLeave}
+                >
                     <Menu onSelect={setContent} setNavigator={setNavigator} />
                 </div>
                 <div className="right-panel">
