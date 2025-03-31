@@ -25,7 +25,7 @@ COPY . .
 RUN npm run build
 
 # 사용할 포트 설정
-EXPOSE 5173 3000
+EXPOSE 5179 3009
 
 # 컨테이너 시작 시 Vite 및 Node 서버 실행
 CMD ["npm", "run", "prd"]
