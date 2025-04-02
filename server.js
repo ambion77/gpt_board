@@ -17,6 +17,7 @@ import excelUploadRoutes from './routes/excelUploadRoutes.js';
 import excelDownloadRoutes from './routes/excelDownloadRoutes.js';
 import excelRoutes from './routes/excelRoutes.js';
 import googleTrendsRoutes from './routes/googleTrendsRoutes.js';
+import { sendTelegramMessage } from './telegramBot.js'; // 텔레그램 봇 모듈 import
 import watchLog from './watchLog.js';
 
 if (process.env.NODE_ENV === 'prd') {

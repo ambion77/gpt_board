@@ -149,6 +149,10 @@ const App = () => {
     if (jwtToken != null) {
         // 토큰 분해
         tokenParts = jwtToken.split('.');
+        console.log("헤더:", tokenParts[0]);
+        console.log("페이로드:", tokenParts[1]);
+        console.log("서명:", tokenParts[2]);
+        
         // 페이로드 추출 (Base64 디코딩)
         payload = JSON.parse(atob(tokenParts[1]));
         console.log("사용자 정보:", payload);

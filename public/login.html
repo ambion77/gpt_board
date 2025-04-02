@@ -17,6 +17,26 @@
             margin: 5px;
             padding: 10px;
         }
+        /* 팝업 레이어 스타일 */
+        .login-popup-layer {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .login-popup-content {
+            background-color: white;
+            padding: 20px;
+            border-radius: 5px;
+            text-align: center;
+        }
     </style>
 </head>
 <body>
@@ -26,27 +46,93 @@
     <button onclick="login()">로그인</button>
     <p id="message"></p>
 
+    <!-- 텔레그램 ID 입력 팝업 -->
+    <div id="telegramPopup" class="login-popup-layer">
+        <div class="login-popup-content">
+            <div id="telegramIdInputArea">
+                <h2>텔레그램 사용자명을 입력하세요</h2>
+                <input type="text" id="telegramId" placeholder="Telegram 사용자명">
+                <button id="sendCodeButton">인증번호 발송</button>
+            </div>
+            <div id="verificationCodeArea" style="display: none;">
+                <h2>인증번호를 입력하세요</h2>
+                <input type="text" id="verificationCode" placeholder="인증번호">
+                <button id="verifyCodeButton">인증하기</button>
+            </div>
+        </div>
+    </div>
+
     <script>
+        const telegramPopup = document.getElementById('telegramPopup');
+        const telegramIdInputArea = document.getElementById('telegramIdInputArea');
+        const verificationCodeArea = document.getElementById('verificationCodeArea');
+        const sendCodeButton = document.getElementById('sendCodeButton');
+        const verifyCodeButton = document.getElementById('verifyCodeButton');
+        const telegramIdInput = document.getElementById('telegramId');
+        const verificationCodeInput = document.getElementById('verificationCode');
+        const apiBaseUrl = "http://"+window.location.hostname+":3000";
+
         async function login() {
             const userid = document.getElementById("userid").value;
             const password = document.getElementById("password").value;
-            const apiBaseUrl = "http://"+window.location.hostname+":3000";
+
             const response = await fetch(`${apiBaseUrl}/api/auth/login`, {
                 method: "POST",
-                headers: { "Content-Type": "application/json" ,Authorization: `Bearer ${localStorage.getItem("jwt")}`,},
+                headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ userid, password })
             });
 
             const data = await response.json();
 
             if (response.ok) {
-                document.getElementById("message").innerText = "✅ 로그인 성공!";
-                localStorage.setItem("jwt", data.token); // 토큰 저장
-                setTimeout(() => window.location.href = "/App", 500); // 로그인 후 이동
+                // 로그인 성공 시 텔레그램 ID 입력 팝업 표시
+                telegramPopup.style.display = 'flex';
+                localStorage.setItem('jwt', data.token);    //방법1)사용자입력id로 jwt 발급받는 경우 
             } else {
                 document.getElementById("message").innerText = `❌ ${data.message}`;
             }
         }
+
+        sendCodeButton.addEventListener('click', async () => {
+            const telegramId = telegramIdInput.value;
+
+            const response = await fetch(`${apiBaseUrl}/api/auth/sendVerificationCode`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ telegramId }),
+            });
+
+            const data = await response.json();
+
+            if (response.ok) {
+                // 인증번호 발송 성공 시 인증번호 입력 화면으로 전환
+                telegramIdInputArea.style.display = 'none';
+                verificationCodeArea.style.display = 'block';
+            } else {
+                alert(data.message || '인증번호 발송 실패');
+            }
+        });
+
+        verifyCodeButton.addEventListener('click', async () => {
+            const verificationCode = verificationCodeInput.value;
+            const telegramId = telegramIdInput.value;
+
+            const response = await fetch(`${apiBaseUrl}/api/auth/verifyCode`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ verificationCode, telegramId }),
+            });
+
+            const data = await response.json();
+
+            if (response.ok) {
+                // 인증 성공 시 JWT 토큰 저장 및 /App으로 이동
+                //localStorage.setItem('jwt', data.token);  //방법2)텔레그램 id로 jwt 발급받는 경우
+                window.location.href = '/App';
+            } else {
+                alert(data.message || '인증 실패');
+            }
+        });
     </script>
 </body>
 </html>
