@@ -200,5 +200,17 @@ Dockerfile
 4. docker빌드
 docker build -t my-app . 
 
-4. docker실행
+5. docker실행
 docker run -p 5173:5173 -p 3000:3000 my-app
+
+6.자동빌드
+crontab -e
+
+#### 매일 23시 1분에 PM2 서버 중지
+20 15 * * * bash -lc '(pm2 delete myserver || true)' >> /home/ec2-user/gpt_board/cron.log 2>&1
+
+#### 매일 23시 2분에 Git 저장소 업데이트
+21 15 * * * bash -lc 'cd /home/ec2-user/gpt_board && git pull origin main >> /home/ec2-user/gpt_board/cron.log 2>&1
+
+#### 매일 23시 3분에 PM2 서버 시작 (업데이트된 코드로)
+22 15 * * * bash -lc 'cd /home/ec2-user/gpt_board && pm2 start npm --name myserver -- run prd' >> /home/ec2-user/gpt_board/cron.log 2>&1
