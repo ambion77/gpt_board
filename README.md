@@ -210,7 +210,7 @@ crontab -e
 20 15 * * * bash -lc '(pm2 delete myserver || true)' >> /home/ec2-user/gpt_board/cron.log 2>&1
 
 #### 매일 23시 2분에 Git 저장소 업데이트
-21 15 * * * bash -lc 'cd /home/ec2-user/gpt_board && git pull origin main >> /home/ec2-user/gpt_board/cron.log 2>&1
+21 15 * * * bash -lc 'cd /home/ec2-user/gpt_board && git pull origin main' >> /home/ec2-user/gpt_board/cron.log 2>&1
 
 #### 매일 23시 3분에 PM2 서버 시작 (업데이트된 코드로)
 22 15 * * * bash -lc 'cd /home/ec2-user/gpt_board && pm2 start npm --name myserver -- run prd' >> /home/ec2-user/gpt_board/cron.log 2>&1
