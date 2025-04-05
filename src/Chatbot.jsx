@@ -1,8 +1,11 @@
 import React, { useState, useRef, useEffect } from 'react';
 import axios from 'axios';
 
+const chatbotUrl = import.meta.env.VITE_CHATBOT_URL;    // Vite 환경 변수 사용(꼭VITE라는명으로 시작해야함)
+
+
 const api = axios.create({
-  baseURL: 'http://localhost:3007',
+  baseURL: chatbotUrl,
 });
 
 const Chatbot = () => {

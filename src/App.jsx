@@ -38,8 +38,7 @@ const menuData = [
     { "id": 41, "menuid": "M00401", "menuname": "ExcelUpload", "depth": 1, "url": "ExcelUpload" },
     { "id": 42, "menuid": "M00402", "menuname": "ExcelDownload", "depth": 1, "url": "ExcelDownload" },
     { "id": 43, "menuid": "M00403", "menuname": "Excel데이터", "depth": 1, "url": "Excellist" },
-    { "id": 44, "menuid": "M00404", "menuname": "Chatbot", "depth": 1, "url": "Chatbot" },
-
+    
     { "id": 50, "menuid": "M005", "menuname": "게임", "depth": 0, "url": "" },
     { "id": 51, "menuid": "M00501", "menuname": "타자연습", "depth": 1, "url": "TypingGame" },
     { "id": 52, "menuid": "M00502", "menuname": "테트리스", "depth": 1, "url": "Tetris" },
