@@ -4,9 +4,9 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "loc": "concurrently \"vite --host --mode loc\" \"cross-env NODE_ENV=loc node server.js\" \"cross-env NODE_ENV=loc node chatbot.js\"",
-    "dev": "concurrently \"vite --host --mode dev\" \"cross-env NODE_ENV=dev node server.js\" \"cross-env NODE_ENV=dev node chatbot.js\"",
-    "prd": "concurrently \"vite --host --mode prd\" \"cross-env NODE_ENV=prd node server.js\" \"cross-env NODE_ENV=prd node chatbot.js\"",
+    "loc": "concurrently \"vite --host --mode loc\" \"cross-env NODE_ENV=loc node server.js\" \"node chatbot.js\"",
+    "dev": "concurrently \"vite --host --mode dev\" \"cross-env NODE_ENV=dev node server.js\" \"node chatbot.js\"",
+    "prd": "concurrently \"vite --host --mode prd\" \"cross-env NODE_ENV=prd node server.js\" \"node chatbot.js\"",
     "//": "//는 주석이란 뜻. 실행시 concurrently는 vite 서버와 node 서버를 동시에 실행한다는 뜻.vite는 5173포트, node는 3000포트로 실행. cross-env 는 개발과 운영 환경설정 구분용.",
     "build": "vite build",
     "lint": "eslint .",
