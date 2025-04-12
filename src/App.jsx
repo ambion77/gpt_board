@@ -15,6 +15,7 @@ import Map from "./Map";
 import GoogleTrends from "./GoogleTrends";
 import TypingGame from "./TypingGame";
 import Chatbot from "./Chatbot";
+import PlaylistViewer from "./PlaylistViewer";
 
 const menuData = [
     { "id": 10, "menuid": "M001", "menuname": "시스템관리", "depth": 0, "url": "" },
@@ -33,7 +34,8 @@ const menuData = [
     { "id": 34, "menuid": "M00304", "menuname": "Gpt요약", "depth": 1, "url": "GptSummary" },
     { "id": 35, "menuid": "M00305", "menuname": "map", "depth": 1, "url": "Map" },
     { "id": 36, "menuid": "M00306", "menuname": "구글트렌드", "depth": 1, "url": "GoogleTrends" },
-
+    { "id": 37, "menuid": "M00307", "menuname": "배철수음악캠프", "depth": 1, "url": "PlaylistViewer" },
+    
     { "id": 40, "menuid": "M004", "menuname": "유틸기능관리", "depth": 0, "url": "" },
     { "id": 41, "menuid": "M00401", "menuname": "ExcelUpload", "depth": 1, "url": "ExcelUpload" },
     { "id": 42, "menuid": "M00402", "menuname": "ExcelDownload", "depth": 1, "url": "ExcelDownload" },
@@ -75,6 +77,8 @@ const MenuItem = ({ item, onSelect, activeMenu, setActiveMenu, setNavigator }) =
             onSelect(<Map />);
         } else if (item.menuid === "M00306") {
             onSelect(<GoogleTrends />);
+        } else if (item.menuid === "M00307") {
+            onSelect(<PlaylistViewer />);    
         } else if (item.menuid === "M00401") {
             onSelect(<ExcelUpload />);
         } else if (item.menuid === "M00402") {
